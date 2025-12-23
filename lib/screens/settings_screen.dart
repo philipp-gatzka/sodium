@@ -1,16 +1,74 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../providers/recipe_provider.dart';
 import '../providers/settings_provider.dart';
+import '../services/export_service.dart';
 
 /// Screen for managing app settings.
 ///
-/// Allows users to change theme mode (light, dark, system).
-class SettingsScreen extends ConsumerWidget {
+/// Allows users to change theme mode (light, dark, system) and export recipes.
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  bool _isExporting = false;
+
+  Future<void> _exportRecipes() async {
+    setState(() {
+      _isExporting = true;
+    });
+
+    try {
+      final recipes = await ref.read(recipesProvider.future);
+
+      if (recipes.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No recipes to export'),
+            ),
+          );
+        }
+        return;
+      }
+
+      final exportService = ExportService();
+      final result = await exportService.shareRecipes(recipes);
+
+      if (mounted) {
+        if (result.status == ShareResultStatus.success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Exported ${recipes.length} recipe(s)'),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Export failed: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isExporting = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final themeMode = ref.watch(themeModeProvider);
 
     return Scaffold(
@@ -25,6 +83,20 @@ class SettingsScreen extends ConsumerWidget {
             onModeSelected: (mode) {
               ref.read(themeModeProvider.notifier).state = mode;
             },
+          ),
+          const SizedBox(height: 24),
+          const _SectionHeader(title: 'Data'),
+          ListTile(
+            leading: _isExporting
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.upload_file),
+            title: const Text('Export Recipes'),
+            subtitle: const Text('Save recipes as JSON file'),
+            onTap: _isExporting ? null : _exportRecipes,
           ),
           const SizedBox(height: 24),
           const _SectionHeader(title: 'About'),
