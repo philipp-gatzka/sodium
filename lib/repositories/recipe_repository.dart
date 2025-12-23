@@ -61,4 +61,22 @@ class RecipeRepository {
       return await _isar.recipes.delete(id);
     });
   }
+
+  /// Searches for recipes where the title contains the query.
+  ///
+  /// The search is case-insensitive. Returns all recipes if query is empty.
+  /// Results are sorted by [createdAt] descending (newest first).
+  Future<List<Recipe>> searchRecipes(String query) async {
+    final trimmedQuery = query.trim();
+
+    if (trimmedQuery.isEmpty) {
+      return getAllRecipes();
+    }
+
+    return await _isar.recipes
+        .filter()
+        .titleContains(trimmedQuery, caseSensitive: false)
+        .sortByCreatedAtDesc()
+        .findAll();
+  }
 }
