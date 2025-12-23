@@ -28,10 +28,10 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
           const _SectionHeader(title: 'About'),
-          ListTile(
-            leading: const Icon(Icons.info_outline),
-            title: const Text('Version'),
-            subtitle: const Text('1.0.0'),
+          const ListTile(
+            leading: Icon(Icons.info_outline),
+            title: Text('Version'),
+            subtitle: Text('1.0.0'),
           ),
         ],
       ),
