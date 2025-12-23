@@ -408,4 +408,205 @@ void main() {
       expect(results.first.title, equals('Chocolate Cake'));
     });
   });
+
+  group('recipeByIdProvider', () {
+    test('should be a FutureProvider.family', () {
+      expect(
+        recipeByIdProvider,
+        isA<FutureProviderFamily<Recipe?, int>>(),
+      );
+    });
+
+    test('should return recipe for valid ID', () async {
+      final container = ProviderContainer(
+        overrides: [
+          isarProvider.overrideWith((ref) async => testIsar),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(isarProvider.future);
+
+      final repository = container.read(recipeRepositoryProvider);
+      final recipe = await repository.addRecipe(Recipe()
+        ..title = 'Test Recipe'
+        ..ingredients = ['ingredient']
+        ..instructions = ['step']);
+
+      final result = await container.read(recipeByIdProvider(recipe.id).future);
+
+      expect(result, isNotNull);
+      expect(result!.title, equals('Test Recipe'));
+    });
+
+    test('should return null for non-existent ID', () async {
+      final container = ProviderContainer(
+        overrides: [
+          isarProvider.overrideWith((ref) async => testIsar),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(isarProvider.future);
+
+      final result = await container.read(recipeByIdProvider(99999).future);
+
+      expect(result, isNull);
+    });
+  });
+
+  group('favoriteRecipesProvider', () {
+    test('should be a FutureProvider<List<Recipe>>', () {
+      expect(favoriteRecipesProvider, isA<FutureProvider<List<Recipe>>>());
+    });
+
+    test('should return empty list when no favorites exist', () async {
+      final container = ProviderContainer(
+        overrides: [
+          isarProvider.overrideWith((ref) async => testIsar),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(isarProvider.future);
+
+      // Add a non-favorite recipe
+      final repository = container.read(recipeRepositoryProvider);
+      await repository.addRecipe(Recipe()
+        ..title = 'Regular Recipe'
+        ..ingredients = []
+        ..instructions = []);
+
+      final favorites = await container.read(favoriteRecipesProvider.future);
+
+      expect(favorites, isEmpty);
+    });
+
+    test('should return only favorite recipes', () async {
+      final container = ProviderContainer(
+        overrides: [
+          isarProvider.overrideWith((ref) async => testIsar),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(isarProvider.future);
+
+      final repository = container.read(recipeRepositoryProvider);
+      await repository.addRecipe(Recipe()
+        ..title = 'Regular Recipe'
+        ..ingredients = []
+        ..instructions = []);
+      await repository.addRecipe(Recipe()
+        ..title = 'Favorite Recipe 1'
+        ..ingredients = []
+        ..instructions = []
+        ..isFavorite = true);
+      await repository.addRecipe(Recipe()
+        ..title = 'Favorite Recipe 2'
+        ..ingredients = []
+        ..instructions = []
+        ..isFavorite = true);
+
+      container.invalidate(favoriteRecipesProvider);
+      final favorites = await container.read(favoriteRecipesProvider.future);
+
+      expect(favorites.length, equals(2));
+      expect(favorites.every((r) => r.isFavorite), isTrue);
+    });
+
+    test('should return favorites sorted by newest first', () async {
+      final container = ProviderContainer(
+        overrides: [
+          isarProvider.overrideWith((ref) async => testIsar),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(isarProvider.future);
+
+      final repository = container.read(recipeRepositoryProvider);
+      await repository.addRecipe(Recipe()
+        ..title = 'First Favorite'
+        ..ingredients = []
+        ..instructions = []
+        ..isFavorite = true);
+
+      await Future.delayed(const Duration(milliseconds: 10));
+
+      await repository.addRecipe(Recipe()
+        ..title = 'Second Favorite'
+        ..ingredients = []
+        ..instructions = []
+        ..isFavorite = true);
+
+      container.invalidate(favoriteRecipesProvider);
+      final favorites = await container.read(favoriteRecipesProvider.future);
+
+      expect(favorites.length, equals(2));
+      expect(favorites[0].title, equals('Second Favorite'));
+      expect(favorites[1].title, equals('First Favorite'));
+    });
+
+    test('should refresh when invalidated', () async {
+      final container = ProviderContainer(
+        overrides: [
+          isarProvider.overrideWith((ref) async => testIsar),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(isarProvider.future);
+
+      // Initially no favorites
+      var favorites = await container.read(favoriteRecipesProvider.future);
+      expect(favorites, isEmpty);
+
+      // Add a favorite
+      final repository = container.read(recipeRepositoryProvider);
+      await repository.addRecipe(Recipe()
+        ..title = 'New Favorite'
+        ..ingredients = []
+        ..instructions = []
+        ..isFavorite = true);
+
+      // Invalidate to refresh
+      container.invalidate(favoriteRecipesProvider);
+
+      // Should now have the favorite
+      favorites = await container.read(favoriteRecipesProvider.future);
+      expect(favorites.length, equals(1));
+      expect(favorites.first.title, equals('New Favorite'));
+    });
+  });
+
+  group('showFavoritesOnlyProvider', () {
+    test('should be a StateProvider<bool>', () {
+      expect(showFavoritesOnlyProvider, isA<StateProvider<bool>>());
+    });
+
+    test('should default to false', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      final showFavoritesOnly = container.read(showFavoritesOnlyProvider);
+
+      expect(showFavoritesOnly, isFalse);
+    });
+
+    test('should allow toggling value', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      expect(container.read(showFavoritesOnlyProvider), isFalse);
+
+      container.read(showFavoritesOnlyProvider.notifier).state = true;
+
+      expect(container.read(showFavoritesOnlyProvider), isTrue);
+
+      container.read(showFavoritesOnlyProvider.notifier).state = false;
+
+      expect(container.read(showFavoritesOnlyProvider), isFalse);
+    });
+  });
 }
