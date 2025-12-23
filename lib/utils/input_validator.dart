@@ -207,6 +207,8 @@ class ErrorMessages {
       'Failed to load recipes. Please try again.';
   static const String loadRecipeFailed =
       'Failed to load recipe. Please try again.';
+  static const String loadFavoritesFailed =
+      'Failed to load favorites. Please try again.';
   static const String saveRecipeFailed =
       'Unable to save recipe. Please check your input and try again.';
   static const String deleteRecipeFailed =
