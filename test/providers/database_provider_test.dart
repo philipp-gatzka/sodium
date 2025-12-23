@@ -49,6 +49,11 @@ void main() {
 
       final isar = await container.read(isarProvider.future);
 
+      // Clear any existing data first
+      await isar.writeTxn(() async {
+        await isar.recipes.clear();
+      });
+
       // Write a recipe
       await isar.writeTxn(() async {
         await isar.recipes.put(Recipe()
