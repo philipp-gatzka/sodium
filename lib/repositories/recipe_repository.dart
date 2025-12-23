@@ -23,4 +23,12 @@ class RecipeRepository {
 
     return recipe;
   }
+
+  /// Retrieves all recipes from the database.
+  ///
+  /// Returns recipes sorted by [createdAt] descending (newest first).
+  /// Returns an empty list if no recipes exist.
+  Future<List<Recipe>> getAllRecipes() async {
+    return await _isar.recipes.where().sortByCreatedAtDesc().findAll();
+  }
 }

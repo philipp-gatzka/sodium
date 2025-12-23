@@ -95,5 +95,62 @@ void main() {
         expect(retrieved.instructions, equals(['mix', 'bake']));
       });
     });
+
+    group('getAllRecipes', () {
+      test('should return empty list when no recipes exist', () async {
+        final recipes = await repository.getAllRecipes();
+
+        expect(recipes, isEmpty);
+      });
+
+      test('should return all recipes from database', () async {
+        await repository.addRecipe(Recipe()
+          ..title = 'Recipe 1'
+          ..ingredients = []
+          ..instructions = []);
+        await repository.addRecipe(Recipe()
+          ..title = 'Recipe 2'
+          ..ingredients = []
+          ..instructions = []);
+        await repository.addRecipe(Recipe()
+          ..title = 'Recipe 3'
+          ..ingredients = []
+          ..instructions = []);
+
+        final recipes = await repository.getAllRecipes();
+
+        expect(recipes.length, equals(3));
+      });
+
+      test('should return recipes sorted by createdAt descending', () async {
+        await repository.addRecipe(Recipe()
+          ..title = 'First Recipe'
+          ..ingredients = []
+          ..instructions = []);
+
+        // Small delay to ensure different timestamps
+        await Future.delayed(const Duration(milliseconds: 10));
+
+        await repository.addRecipe(Recipe()
+          ..title = 'Second Recipe'
+          ..ingredients = []
+          ..instructions = []);
+
+        await Future.delayed(const Duration(milliseconds: 10));
+
+        await repository.addRecipe(Recipe()
+          ..title = 'Third Recipe'
+          ..ingredients = []
+          ..instructions = []);
+
+        final recipes = await repository.getAllRecipes();
+
+        expect(recipes.length, equals(3));
+        // Newest first
+        expect(recipes[0].title, equals('Third Recipe'));
+        expect(recipes[1].title, equals('Second Recipe'));
+        expect(recipes[2].title, equals('First Recipe'));
+      });
+    });
   });
 }
