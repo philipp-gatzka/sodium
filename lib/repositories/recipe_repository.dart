@@ -1,6 +1,7 @@
 import 'package:isar/isar.dart';
 
 import '../models/recipe.dart';
+import '../models/sort_option.dart';
 
 /// Repository for managing Recipe data in the Isar database.
 class RecipeRepository {
@@ -30,6 +31,44 @@ class RecipeRepository {
   /// Returns an empty list if no recipes exist.
   Future<List<Recipe>> getAllRecipes() async {
     return await _isar.recipes.where().sortByCreatedAtDesc().findAll();
+  }
+
+  /// Retrieves all recipes from the database with specified sorting.
+  ///
+  /// The [sortOption] determines the order of the returned recipes.
+  /// Returns an empty list if no recipes exist.
+  Future<List<Recipe>> getAllRecipesSorted(RecipeSortOption sortOption) async {
+    switch (sortOption) {
+      case RecipeSortOption.newestFirst:
+        return await _isar.recipes.where().sortByCreatedAtDesc().findAll();
+      case RecipeSortOption.oldestFirst:
+        return await _isar.recipes.where().sortByCreatedAt().findAll();
+      case RecipeSortOption.titleAZ:
+        return await _isar.recipes.where().sortByTitle().findAll();
+      case RecipeSortOption.titleZA:
+        return await _isar.recipes.where().sortByTitleDesc().findAll();
+      case RecipeSortOption.quickestFirst:
+        // Get all recipes and sort in memory since totalTime is computed
+        final recipes = await _isar.recipes.where().findAll();
+        recipes.sort((a, b) {
+          final aTime = a.totalTimeMinutes ?? double.maxFinite.toInt();
+          final bTime = b.totalTimeMinutes ?? double.maxFinite.toInt();
+          return aTime.compareTo(bTime);
+        });
+        return recipes;
+      case RecipeSortOption.favoritesFirst:
+        // Sort favorites first, then by date
+        final recipes = await _isar.recipes.where().findAll();
+        recipes.sort((a, b) {
+          if (a.isFavorite && !b.isFavorite) return -1;
+          if (!a.isFavorite && b.isFavorite) return 1;
+          // Both same favorite status, sort by date descending
+          final aDate = a.createdAt ?? DateTime(1970);
+          final bDate = b.createdAt ?? DateTime(1970);
+          return bDate.compareTo(aDate);
+        });
+        return recipes;
+    }
   }
 
   /// Retrieves a single recipe by its unique ID.
