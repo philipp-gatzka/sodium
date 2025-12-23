@@ -1,0 +1,70 @@
+Sodium is a simple, fast, and private recipe manager designed for home cooks who want to keep their favorite recipes organized without the clutter.
+
+YOUR RECIPES, YOUR DEVICE
+
+Unlike other recipe apps, Sodium stores everything locally on your device. No accounts, no cloud sync, no subscriptions. Your recipes are yours alone.
+
+KEY FEATURES
+
+Recipe Management
+- Create recipes with ingredients, instructions, and cooking times
+- Add prep time, cook time, and serving sizes
+- Set difficulty levels (Easy, Medium, Hard)
+- Mark favorites for quick access
+- Organize with custom categories
+
+Easy Organization
+- Search recipes by title instantly
+- Filter by categories or favorites
+- Sort by name, date, cooking time, or difficulty
+- Quick access to recently added recipes
+
+Beautiful Design
+- Clean, modern Material Design interface
+- Light and dark themes
+- Adapts to your system theme preference
+- Fast and responsive on any device
+
+Data Control
+- Export all recipes to JSON for backup
+- Share exports via email, cloud storage, or messaging
+- No account required - ever
+- Uninstall anytime with no data left behind
+
+PRIVACY FIRST
+
+We believe your recipes are personal. That's why Sodium:
+- Collects zero personal data
+- Has no analytics or tracking
+- Requires no internet connection
+- Never shares anything with anyone
+
+Read our full privacy policy in the app settings.
+
+PERFECT FOR
+
+- Home cooks building a personal recipe collection
+- Anyone tired of recipe apps with ads and subscriptions
+- Privacy-conscious users who want offline-first apps
+- Cooks who want simplicity over complexity
+
+GET STARTED
+
+1. Tap + to add your first recipe
+2. Enter title, ingredients, and instructions
+3. Add optional details like cooking time and servings
+4. Save and start cooking!
+
+COMING SOON
+
+We're actively developing Sodium with new features planned:
+- Recipe photos
+- Ingredient-based search
+- Meal planning
+- Shopping lists
+
+SUPPORT
+
+Found a bug or have a suggestion? Visit our GitHub page to report issues or contribute to the project. Sodium is open source!
+
+Download Sodium today and take control of your recipe collection.
