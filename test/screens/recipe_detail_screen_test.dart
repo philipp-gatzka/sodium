@@ -580,6 +580,186 @@ void main() {
       });
     });
 
+    group('Delete button', () {
+      testWidgets('should display delete button in AppBar', (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) async {
+                return Recipe()
+                  ..id = 1
+                  ..title = 'Test Recipe'
+                  ..ingredients = []
+                  ..instructions = [];
+              }),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        expect(find.byIcon(Icons.delete), findsOneWidget);
+      });
+
+      testWidgets('should have delete button with tooltip', (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) async {
+                return Recipe()
+                  ..id = 1
+                  ..title = 'Test Recipe'
+                  ..ingredients = []
+                  ..instructions = [];
+              }),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        final deleteButton = find.byIcon(Icons.delete);
+        expect(deleteButton, findsOneWidget);
+
+        // Find the IconButton that contains the delete icon
+        final iconButtons = find.byType(IconButton);
+        final deleteIconButton = tester.widget<IconButton>(iconButtons.at(1));
+        expect(deleteIconButton.tooltip, 'Delete recipe');
+      });
+
+      testWidgets('should show confirmation dialog when tapped',
+          (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) async {
+                return Recipe()
+                  ..id = 1
+                  ..title = 'Test Recipe'
+                  ..ingredients = []
+                  ..instructions = [];
+              }),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        // Tap delete button
+        await tester.tap(find.byIcon(Icons.delete));
+        await tester.pumpAndSettle();
+
+        // Should show confirmation dialog
+        expect(find.byType(AlertDialog), findsOneWidget);
+        expect(find.text('Delete this recipe?'), findsOneWidget);
+        expect(find.text('This action cannot be undone.'), findsOneWidget);
+        expect(find.text('Cancel'), findsOneWidget);
+        expect(find.text('Delete'), findsOneWidget);
+      });
+
+      testWidgets('should dismiss dialog when Cancel is tapped',
+          (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) async {
+                return Recipe()
+                  ..id = 1
+                  ..title = 'Test Recipe'
+                  ..ingredients = []
+                  ..instructions = [];
+              }),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        // Tap delete button to show dialog
+        await tester.tap(find.byIcon(Icons.delete));
+        await tester.pumpAndSettle();
+
+        // Tap Cancel
+        await tester.tap(find.text('Cancel'));
+        await tester.pumpAndSettle();
+
+        // Dialog should be dismissed, still on detail screen
+        expect(find.byType(AlertDialog), findsNothing);
+        expect(find.text('Test Recipe'), findsOneWidget);
+      });
+
+      testWidgets('should not display delete button in loading state',
+          (tester) async {
+        final completer = Completer<Recipe?>();
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) => completer.future),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        // In loading state, delete button should not be visible
+        expect(find.byIcon(Icons.delete), findsNothing);
+      });
+
+      testWidgets('should not display delete button in error state',
+          (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) async {
+                throw Exception('Error');
+              }),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        // In error state, delete button should not be visible
+        expect(find.byIcon(Icons.delete), findsNothing);
+      });
+
+      testWidgets('should not display delete button when recipe not found',
+          (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) async => null),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        // When recipe not found, delete button should not be visible
+        expect(find.byIcon(Icons.delete), findsNothing);
+      });
+    });
+
     testWidgets('should have Scaffold', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
