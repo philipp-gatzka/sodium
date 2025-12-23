@@ -39,6 +39,20 @@ class RecipeRepository {
     return await _isar.recipes.get(id);
   }
 
+  /// Updates an existing recipe in the database.
+  ///
+  /// Updates the [updatedAt] timestamp to the current time while preserving
+  /// the original [createdAt] timestamp. Returns the updated recipe.
+  Future<Recipe> updateRecipe(Recipe recipe) async {
+    recipe.updatedAt = DateTime.now();
+
+    await _isar.writeTxn(() async {
+      await _isar.recipes.put(recipe);
+    });
+
+    return recipe;
+  }
+
   /// Deletes a recipe from the database by its ID.
   ///
   /// Returns true if the recipe was deleted, false if it didn't exist.
