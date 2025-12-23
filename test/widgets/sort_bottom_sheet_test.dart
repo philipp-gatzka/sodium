@@ -97,6 +97,11 @@ void main() {
     });
 
     testWidgets('show method should return selected option', (tester) async {
+      // Set a larger screen size to avoid overflow in bottom sheet
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.resetPhysicalSize());
+
       RecipeSortOption? result;
 
       await tester.pumpWidget(
