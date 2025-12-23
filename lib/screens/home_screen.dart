@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/recipe_provider.dart';
+import '../utils/input_validator.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/recipe_card.dart';
@@ -53,7 +54,35 @@ class HomeScreen extends ConsumerWidget {
             child: recipesAsync.when(
               loading: () => const LoadingWidget(),
               error: (error, stack) => Center(
-                child: Text('Error: $error'),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      searchQuery.isNotEmpty
+                          ? ErrorMessages.searchFailed
+                          : ErrorMessages.loadRecipesFailed,
+                      style: Theme.of(context).textTheme.titleMedium,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (searchQuery.isNotEmpty) {
+                          ref.invalidate(recipeSearchProvider(searchQuery));
+                        } else {
+                          ref.invalidate(recipesProvider);
+                        }
+                      },
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
               ),
               data: (recipes) {
                 if (recipes.isEmpty) {

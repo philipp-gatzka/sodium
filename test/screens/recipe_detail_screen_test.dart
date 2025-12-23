@@ -65,8 +65,10 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        expect(find.text('Failed to load recipe'), findsOneWidget);
+        expect(find.text('Failed to load recipe. Please try again.'),
+            findsOneWidget);
         expect(find.byIcon(Icons.error_outline), findsOneWidget);
+        expect(find.text('Retry'), findsOneWidget);
       });
 
       testWidgets('should display "Error" in AppBar on error', (tester) async {

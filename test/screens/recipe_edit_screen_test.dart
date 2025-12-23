@@ -157,7 +157,7 @@ void main() {
         await tester.tap(find.byIcon(Icons.check));
         await tester.pumpAndSettle();
 
-        expect(find.text('Please enter a recipe title'), findsOneWidget);
+        expect(find.text('Title is required'), findsOneWidget);
       });
 
       testWidgets('should not show error when title is entered',
@@ -180,7 +180,7 @@ void main() {
         await tester.tap(find.byIcon(Icons.check));
         await tester.pumpAndSettle();
 
-        expect(find.text('Please enter a recipe title'), findsNothing);
+        expect(find.text('Title is required'), findsNothing);
       });
 
       testWidgets('should have Form widget', (tester) async {
