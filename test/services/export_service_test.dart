@@ -189,7 +189,7 @@ void main() {
 
     group('exportVersion', () {
       test('should be a valid semver string', () {
-        final version = ExportService.exportVersion;
+        const version = ExportService.exportVersion;
 
         // Should match semver pattern (x.y.z)
         expect(RegExp(r'^\d+\.\d+\.\d+$').hasMatch(version), isTrue);
