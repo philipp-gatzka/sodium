@@ -311,5 +311,80 @@ void main() {
         expect(retrieved!.title, equals('Recipe 2'));
       });
     });
+
+    group('searchRecipes', () {
+      test('should return matching recipes', () async {
+        await repository.addRecipe(Recipe()
+          ..title = 'Chocolate Cake'
+          ..ingredients = []
+          ..instructions = []);
+        await repository.addRecipe(Recipe()
+          ..title = 'Vanilla Pudding'
+          ..ingredients = []
+          ..instructions = []);
+        await repository.addRecipe(Recipe()
+          ..title = 'Chocolate Mousse'
+          ..ingredients = []
+          ..instructions = []);
+
+        final results = await repository.searchRecipes('Chocolate');
+
+        expect(results.length, equals(2));
+        expect(results.every((r) => r.title.contains('Chocolate')), isTrue);
+      });
+
+      test('should return empty list when no matches', () async {
+        await repository.addRecipe(Recipe()
+          ..title = 'Apple Pie'
+          ..ingredients = []
+          ..instructions = []);
+
+        final results = await repository.searchRecipes('Chocolate');
+
+        expect(results, isEmpty);
+      });
+
+      test('should be case-insensitive', () async {
+        await repository.addRecipe(Recipe()
+          ..title = 'CHOCOLATE CAKE'
+          ..ingredients = []
+          ..instructions = []);
+        await repository.addRecipe(Recipe()
+          ..title = 'chocolate mousse'
+          ..ingredients = []
+          ..instructions = []);
+
+        final results = await repository.searchRecipes('ChOcOlAtE');
+
+        expect(results.length, equals(2));
+      });
+
+      test('should return all recipes for empty query', () async {
+        await repository.addRecipe(Recipe()
+          ..title = 'Recipe 1'
+          ..ingredients = []
+          ..instructions = []);
+        await repository.addRecipe(Recipe()
+          ..title = 'Recipe 2'
+          ..ingredients = []
+          ..instructions = []);
+
+        final results = await repository.searchRecipes('');
+
+        expect(results.length, equals(2));
+      });
+
+      test('should trim whitespace from query', () async {
+        await repository.addRecipe(Recipe()
+          ..title = 'Chocolate Cake'
+          ..ingredients = []
+          ..instructions = []);
+
+        final results = await repository.searchRecipes('  Chocolate  ');
+
+        expect(results.length, equals(1));
+        expect(results[0].title, equals('Chocolate Cake'));
+      });
+    });
   });
 }
