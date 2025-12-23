@@ -16,6 +16,12 @@ class HomeScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('My Recipes'),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // TODO: Navigate to recipe edit screen (create mode)
+        },
+        child: const Icon(Icons.add),
+      ),
       body: recipesAsync.when(
         loading: () => const Center(
           child: CircularProgressIndicator(),

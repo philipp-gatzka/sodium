@@ -178,5 +178,61 @@ void main() {
 
       expect(find.byType(ListView), findsOneWidget);
     });
+
+    testWidgets('should have a FloatingActionButton', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            recipesProvider.overrideWith((ref) async => <Recipe>[]),
+          ],
+          child: const MaterialApp(
+            home: HomeScreen(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.byType(FloatingActionButton), findsOneWidget);
+    });
+
+    testWidgets('FAB should have add icon', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            recipesProvider.overrideWith((ref) async => <Recipe>[]),
+          ],
+          child: const MaterialApp(
+            home: HomeScreen(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.add), findsOneWidget);
+    });
+
+    testWidgets('FAB should be tappable', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            recipesProvider.overrideWith((ref) async => <Recipe>[]),
+          ],
+          child: const MaterialApp(
+            home: HomeScreen(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // FAB should be tappable without error
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+
+      // FAB should still be visible after tap
+      expect(find.byType(FloatingActionButton), findsOneWidget);
+    });
   });
 }
