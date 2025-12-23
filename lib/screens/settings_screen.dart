@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../providers/recipe_provider.dart';
 import '../providers/settings_provider.dart';
 import '../services/export_service.dart';
+
+/// URL to the privacy policy document.
+const String _privacyPolicyUrl =
+    'https://github.com/philipp-gatzka/sodium/blob/main/PRIVACY_POLICY.md';
 
 /// Screen for managing app settings.
 ///
@@ -18,6 +23,21 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _isExporting = false;
+
+  Future<void> _openPrivacyPolicy() async {
+    final uri = Uri.parse(_privacyPolicyUrl);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not open privacy policy'),
+          ),
+        );
+      }
+    }
+  }
 
   Future<void> _exportRecipes() async {
     setState(() {
@@ -105,6 +125,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             leading: Icon(Icons.info_outline),
             title: Text('Version'),
             subtitle: Text('1.0.0'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.privacy_tip_outlined),
+            title: const Text('Privacy Policy'),
+            subtitle: const Text('View how your data is handled'),
+            trailing: const Icon(Icons.open_in_new, size: 18),
+            onTap: _openPrivacyPolicy,
           ),
         ],
       ),

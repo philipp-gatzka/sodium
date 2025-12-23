@@ -237,5 +237,20 @@ void main() {
         expect(find.byIcon(Icons.check), findsOneWidget);
       },
     );
+
+    testWidgets('should display privacy policy option', (tester) async {
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(
+            home: SettingsScreen(),
+          ),
+        ),
+      );
+
+      expect(find.text('Privacy Policy'), findsOneWidget);
+      expect(find.text('View how your data is handled'), findsOneWidget);
+      expect(find.byIcon(Icons.privacy_tip_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.open_in_new), findsOneWidget);
+    });
   });
 }
