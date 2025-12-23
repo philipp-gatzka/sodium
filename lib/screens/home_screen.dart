@@ -6,6 +6,8 @@ import '../widgets/empty_state.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/recipe_card.dart';
 import '../widgets/search_bar.dart';
+import 'recipe_detail_screen.dart';
+import 'recipe_edit_screen.dart';
 
 /// Provider to track the current search query.
 final searchQueryProvider = StateProvider<String>((ref) => '');
@@ -26,8 +28,14 @@ class HomeScreen extends ConsumerWidget {
         title: const Text('My Recipes'),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // TODO: Navigate to recipe edit screen (create mode)
+        onPressed: () async {
+          await Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const RecipeEditScreen(),
+            ),
+          );
+          // Refresh the list after returning
+          ref.invalidate(recipesProvider);
         },
         child: const Icon(Icons.add),
       ),
@@ -72,8 +80,15 @@ class HomeScreen extends ConsumerWidget {
                       padding: const EdgeInsets.only(bottom: 8),
                       child: RecipeCard(
                         recipe: recipe,
-                        onTap: () {
-                          // TODO: Navigate to recipe detail screen
+                        onTap: () async {
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  RecipeDetailScreen(recipeId: recipe.id),
+                            ),
+                          );
+                          // Refresh the list after returning (recipe might have been deleted)
+                          ref.invalidate(recipesProvider);
                         },
                       ),
                     );
