@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/recipe_provider.dart';
 import '../widgets/empty_state.dart';
+import '../widgets/loading_widget.dart';
 import '../widgets/recipe_card.dart';
 
 /// The main home screen displaying the list of recipes.
@@ -24,9 +25,7 @@ class HomeScreen extends ConsumerWidget {
         child: const Icon(Icons.add),
       ),
       body: recipesAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
+        loading: () => const LoadingWidget(),
         error: (error, stack) => Center(
           child: Text('Error: $error'),
         ),
