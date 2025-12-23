@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/recipe.dart';
 import '../providers/recipe_provider.dart';
+import '../utils/input_validator.dart';
 import '../widgets/ingredients_input.dart';
 import '../widgets/instructions_input.dart';
 
@@ -28,6 +29,8 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
   List<String> _ingredients = [];
   List<String> _instructions = [];
   bool _isSaving = false;
+  bool _isLoading = false;
+  String? _loadError;
 
   bool get isEditMode => widget.recipeId != null;
 
@@ -40,14 +43,34 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
   }
 
   Future<void> _loadRecipe() async {
-    final repository = ref.read(recipeRepositoryProvider);
-    final recipe = await repository.getRecipeById(widget.recipeId!);
-    if (recipe != null && mounted) {
-      setState(() {
-        _titleController.text = recipe.title;
-        _ingredients = List.from(recipe.ingredients);
-        _instructions = List.from(recipe.instructions);
-      });
+    setState(() {
+      _isLoading = true;
+      _loadError = null;
+    });
+
+    try {
+      final repository = ref.read(recipeRepositoryProvider);
+      final recipe = await repository.getRecipeById(widget.recipeId!);
+      if (recipe != null && mounted) {
+        setState(() {
+          _titleController.text = recipe.title;
+          _ingredients = List.from(recipe.ingredients);
+          _instructions = List.from(recipe.instructions);
+          _isLoading = false;
+        });
+      } else if (mounted) {
+        setState(() {
+          _loadError = ErrorMessages.recipeNotFound;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _loadError = ErrorMessages.loadRecipeFailed;
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -58,7 +81,23 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
   }
 
   Future<void> _onSave() async {
+    // Validate form fields
     if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    // Validate ingredients
+    final ingredientsResult = InputValidator.validateIngredients(_ingredients);
+    if (!ingredientsResult.isValid) {
+      _showErrorSnackBar(ingredientsResult.errorMessage!);
+      return;
+    }
+
+    // Validate instructions
+    final instructionsResult =
+        InputValidator.validateInstructions(_instructions);
+    if (!instructionsResult.isValid) {
+      _showErrorSnackBar(instructionsResult.errorMessage!);
       return;
     }
 
@@ -69,10 +108,23 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
     try {
       final repository = ref.read(recipeRepositoryProvider);
 
+      // Check recipe limit for new recipes
+      if (!isEditMode) {
+        final currentCount = await repository.getRecipeCount();
+        if (InputValidator.isAtRecipeLimit(currentCount)) {
+          _showErrorSnackBar(ErrorMessages.recipeLimitReached);
+          setState(() {
+            _isSaving = false;
+          });
+          return;
+        }
+      }
+
       final recipe = Recipe()
         ..title = _titleController.text.trim()
-        ..ingredients = _ingredients
-        ..instructions = _instructions;
+        ..ingredients = _ingredients.where((i) => i.trim().isNotEmpty).toList()
+        ..instructions =
+            _instructions.where((i) => i.trim().isNotEmpty).toList();
 
       if (isEditMode) {
         recipe.id = widget.recipeId!;
@@ -89,12 +141,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to save recipe: $e'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
+        _showErrorSnackBar(ErrorMessages.saveRecipeFailed);
       }
     } finally {
       if (mounted) {
@@ -105,15 +152,64 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
     }
   }
 
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ),
+    );
+  }
+
   String? _validateTitle(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Please enter a recipe title';
-    }
-    return null;
+    final result = InputValidator.validateTitle(value);
+    return result.isValid ? null : result.errorMessage;
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(isEditMode ? 'Edit Recipe' : 'New Recipe'),
+        ),
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (_loadError != null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(isEditMode ? 'Edit Recipe' : 'New Recipe'),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 64,
+                color: Theme.of(context).colorScheme.error,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                _loadError!,
+                style: Theme.of(context).textTheme.titleMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _loadRecipe,
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(isEditMode ? 'Edit Recipe' : 'New Recipe'),
@@ -139,13 +235,20 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
             children: [
               TextFormField(
                 controller: _titleController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Recipe Title',
                   hintText: 'Enter recipe name',
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
+                  counterText:
+                      '${_titleController.text.length}/${RecipeLimits.maxTitleLength}',
                 ),
+                maxLength: RecipeLimits.maxTitleLength,
                 validator: _validateTitle,
                 textInputAction: TextInputAction.next,
+                onChanged: (value) {
+                  // Trigger rebuild to update counter
+                  setState(() {});
+                },
               ),
               const SizedBox(height: 24),
               IngredientsInput(

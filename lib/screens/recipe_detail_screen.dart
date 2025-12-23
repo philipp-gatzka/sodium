@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/recipe_provider.dart';
+import '../utils/input_validator.dart';
 import '../widgets/loading_widget.dart';
 import 'recipe_edit_screen.dart';
 
@@ -45,16 +46,16 @@ class RecipeDetailScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Failed to load recipe',
+                  ErrorMessages.loadRecipeFailed,
                   style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  error.toString(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    ref.invalidate(recipeByIdProvider(recipeId));
+                  },
+                  child: const Text('Retry'),
                 ),
               ],
             ),
@@ -143,12 +144,25 @@ class RecipeDetailScreen extends ConsumerWidget {
                   );
 
                   if (confirmed == true) {
-                    final repository = ref.read(recipeRepositoryProvider);
-                    await repository.deleteRecipe(recipeId);
-                    // Refresh recipe list
-                    ref.invalidate(recipesProvider);
-                    if (context.mounted) {
-                      Navigator.of(context).pop();
+                    try {
+                      final repository = ref.read(recipeRepositoryProvider);
+                      await repository.deleteRecipe(recipeId);
+                      // Refresh recipe list
+                      ref.invalidate(recipesProvider);
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content:
+                                const Text(ErrorMessages.deleteRecipeFailed),
+                            backgroundColor:
+                                Theme.of(context).colorScheme.error,
+                          ),
+                        );
+                      }
                     }
                   }
                 },
