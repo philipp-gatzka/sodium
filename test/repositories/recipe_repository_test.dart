@@ -193,6 +193,77 @@ void main() {
       });
     });
 
+    group('updateRecipe', () {
+      test('should update recipe fields in database', () async {
+        final recipe = await repository.addRecipe(Recipe()
+          ..title = 'Original Title'
+          ..ingredients = ['original ingredient']
+          ..instructions = ['original step']);
+
+        recipe.title = 'Updated Title';
+        recipe.ingredients = ['updated ingredient 1', 'updated ingredient 2'];
+        recipe.instructions = ['updated step 1', 'updated step 2'];
+
+        await repository.updateRecipe(recipe);
+        final retrieved = await repository.getRecipeById(recipe.id);
+
+        expect(retrieved, isNotNull);
+        expect(retrieved!.title, equals('Updated Title'));
+        expect(
+          retrieved.ingredients,
+          equals(['updated ingredient 1', 'updated ingredient 2']),
+        );
+        expect(
+          retrieved.instructions,
+          equals(['updated step 1', 'updated step 2']),
+        );
+      });
+
+      test('should update updatedAt timestamp', () async {
+        final recipe = await repository.addRecipe(Recipe()
+          ..title = 'Test Recipe'
+          ..ingredients = []
+          ..instructions = []);
+
+        final originalUpdatedAt = recipe.updatedAt;
+
+        await Future.delayed(const Duration(milliseconds: 10));
+
+        final beforeUpdate = DateTime.now();
+        final updated = await repository.updateRecipe(recipe);
+        final afterUpdate = DateTime.now();
+
+        expect(updated.updatedAt, isNotNull);
+        expect(updated.updatedAt!.isAfter(originalUpdatedAt!), isTrue);
+        expect(
+          updated.updatedAt!
+              .isAfter(beforeUpdate.subtract(const Duration(seconds: 1))),
+          isTrue,
+        );
+        expect(
+          updated.updatedAt!
+              .isBefore(afterUpdate.add(const Duration(seconds: 1))),
+          isTrue,
+        );
+      });
+
+      test('should preserve createdAt timestamp', () async {
+        final recipe = await repository.addRecipe(Recipe()
+          ..title = 'Test Recipe'
+          ..ingredients = []
+          ..instructions = []);
+
+        final originalCreatedAt = recipe.createdAt;
+
+        await Future.delayed(const Duration(milliseconds: 10));
+
+        recipe.title = 'Updated Title';
+        final updated = await repository.updateRecipe(recipe);
+
+        expect(updated.createdAt, equals(originalCreatedAt));
+      });
+    });
+
     group('deleteRecipe', () {
       test('should delete recipe and return true', () async {
         final recipe = await repository.addRecipe(Recipe()
