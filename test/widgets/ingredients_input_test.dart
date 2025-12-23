@@ -99,7 +99,8 @@ void main() {
         expect(find.text('Olive Oil'), findsOneWidget);
       });
 
-      testWidgets('should show remove buttons when multiple initial ingredients',
+      testWidgets(
+          'should show remove buttons when multiple initial ingredients',
           (tester) async {
         await tester.pumpWidget(
           MaterialApp(
@@ -157,7 +158,8 @@ void main() {
         expect(find.byIcon(Icons.close), findsNWidgets(2));
       });
 
-      testWidgets('should call onChange when adding ingredient', (tester) async {
+      testWidgets('should call onChange when adding ingredient',
+          (tester) async {
         var callCount = 0;
         await tester.pumpWidget(
           MaterialApp(
