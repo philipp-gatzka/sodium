@@ -215,7 +215,8 @@ void main() {
       expect(find.byIcon(Icons.add), findsOneWidget);
     });
 
-    testWidgets('FAB should be tappable', (tester) async {
+    testWidgets('FAB should navigate to create screen when tapped',
+        (tester) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -229,12 +230,12 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // FAB should be tappable without error
+      // FAB should be tappable
       await tester.tap(find.byType(FloatingActionButton));
       await tester.pumpAndSettle();
 
-      // FAB should still be visible after tap
-      expect(find.byType(FloatingActionButton), findsOneWidget);
+      // Should navigate to create screen (RecipeEditScreen in create mode)
+      expect(find.text('New Recipe'), findsOneWidget);
     });
   });
 }
