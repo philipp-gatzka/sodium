@@ -153,11 +153,13 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Should show sanitized error message
+      // Should display user-friendly error message
       expect(find.text('Failed to load recipes. Please try again.'),
           findsOneWidget);
-      expect(find.byIcon(Icons.error_outline), findsOneWidget);
+      // Should have retry button
       expect(find.text('Retry'), findsOneWidget);
+      // Should show error icon
+      expect(find.byIcon(Icons.error_outline), findsOneWidget);
     });
 
     testWidgets('should have ListView when recipes exist', (tester) async {

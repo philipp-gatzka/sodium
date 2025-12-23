@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/recipe_provider.dart';
+import '../utils/input_validator.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/recipe_card.dart';
@@ -88,7 +89,11 @@ class HomeScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Failed to load recipes. Please try again.',
+                      showFavoritesOnly
+                          ? ErrorMessages.loadFavoritesFailed
+                          : searchQuery.isNotEmpty
+                              ? ErrorMessages.searchFailed
+                              : ErrorMessages.loadRecipesFailed,
                       style: Theme.of(context).textTheme.titleMedium,
                       textAlign: TextAlign.center,
                     ),
