@@ -252,5 +252,72 @@ void main() {
       expect(find.byIcon(Icons.privacy_tip_outlined), findsOneWidget);
       expect(find.byIcon(Icons.open_in_new), findsOneWidget);
     });
+
+    testWidgets('should display Data section header', (tester) async {
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(
+            home: SettingsScreen(),
+          ),
+        ),
+      );
+
+      expect(find.text('Data'), findsOneWidget);
+    });
+
+    testWidgets('should display export recipes option', (tester) async {
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(
+            home: SettingsScreen(),
+          ),
+        ),
+      );
+
+      expect(find.text('Export Recipes'), findsOneWidget);
+      expect(find.text('Save recipes as JSON file'), findsOneWidget);
+      expect(find.byIcon(Icons.upload_file), findsOneWidget);
+    });
+
+    testWidgets('privacy policy tile should be tappable', (tester) async {
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(
+            home: SettingsScreen(),
+          ),
+        ),
+      );
+
+      // Find and tap the privacy policy tile
+      final privacyTile = find.ancestor(
+        of: find.text('Privacy Policy'),
+        matching: find.byType(ListTile),
+      );
+      expect(privacyTile, findsOneWidget);
+
+      // Tap should not throw (url_launcher may fail but shouldn't crash)
+      await tester.tap(privacyTile);
+      await tester.pump();
+    });
+
+    testWidgets('export tile should be tappable', (tester) async {
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(
+            home: SettingsScreen(),
+          ),
+        ),
+      );
+
+      // Find and tap the export tile
+      final exportTile = find.ancestor(
+        of: find.text('Export Recipes'),
+        matching: find.byType(ListTile),
+      );
+      expect(exportTile, findsOneWidget);
+
+      await tester.tap(exportTile);
+      await tester.pump();
+    });
   });
 }
