@@ -133,4 +133,136 @@ void main() {
       expect(results.first.title, equals('Chocolate Cake'));
     });
   });
+
+  group('recipesProvider', () {
+    test('should be a FutureProvider<List<Recipe>>', () {
+      expect(recipesProvider, isA<FutureProvider<List<Recipe>>>());
+    });
+
+    test('should return empty list when no recipes exist', () async {
+      final container = ProviderContainer(
+        overrides: [
+          isarProvider.overrideWith((ref) async => testIsar),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(isarProvider.future);
+
+      final recipes = await container.read(recipesProvider.future);
+
+      expect(recipes, isEmpty);
+    });
+
+    test('should return all recipes from repository', () async {
+      final container = ProviderContainer(
+        overrides: [
+          isarProvider.overrideWith((ref) async => testIsar),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(isarProvider.future);
+
+      final repository = container.read(recipeRepositoryProvider);
+      await repository.addRecipe(Recipe()
+        ..title = 'Recipe 1'
+        ..ingredients = []
+        ..instructions = []);
+      await repository.addRecipe(Recipe()
+        ..title = 'Recipe 2'
+        ..ingredients = []
+        ..instructions = []);
+
+      // Invalidate to refresh
+      container.invalidate(recipesProvider);
+
+      final recipes = await container.read(recipesProvider.future);
+
+      expect(recipes.length, equals(2));
+    });
+
+    test('should return recipes sorted by newest first', () async {
+      final container = ProviderContainer(
+        overrides: [
+          isarProvider.overrideWith((ref) async => testIsar),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(isarProvider.future);
+
+      final repository = container.read(recipeRepositoryProvider);
+      await repository.addRecipe(Recipe()
+        ..title = 'First Recipe'
+        ..ingredients = []
+        ..instructions = []);
+
+      await Future.delayed(const Duration(milliseconds: 10));
+
+      await repository.addRecipe(Recipe()
+        ..title = 'Second Recipe'
+        ..ingredients = []
+        ..instructions = []);
+
+      container.invalidate(recipesProvider);
+
+      final recipes = await container.read(recipesProvider.future);
+
+      expect(recipes.length, equals(2));
+      expect(recipes[0].title, equals('Second Recipe'));
+      expect(recipes[1].title, equals('First Recipe'));
+    });
+
+    test('should expose loading state', () async {
+      final container = ProviderContainer(
+        overrides: [
+          isarProvider.overrideWith((ref) async => testIsar),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(isarProvider.future);
+
+      final asyncValue = container.read(recipesProvider);
+
+      expect(
+        asyncValue,
+        anyOf(
+          isA<AsyncLoading<List<Recipe>>>(),
+          isA<AsyncData<List<Recipe>>>(),
+        ),
+      );
+    });
+
+    test('should refresh when invalidated', () async {
+      final container = ProviderContainer(
+        overrides: [
+          isarProvider.overrideWith((ref) async => testIsar),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(isarProvider.future);
+
+      // Initially empty
+      var recipes = await container.read(recipesProvider.future);
+      expect(recipes, isEmpty);
+
+      // Add a recipe
+      final repository = container.read(recipeRepositoryProvider);
+      await repository.addRecipe(Recipe()
+        ..title = 'New Recipe'
+        ..ingredients = []
+        ..instructions = []);
+
+      // Invalidate to refresh
+      container.invalidate(recipesProvider);
+
+      // Should now have the recipe
+      recipes = await container.read(recipesProvider.future);
+      expect(recipes.length, equals(1));
+      expect(recipes.first.title, equals('New Recipe'));
+    });
+  });
 }
