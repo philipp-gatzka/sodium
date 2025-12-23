@@ -149,23 +149,31 @@ void main() {
       });
 
       test('should have enabled border', () {
-        expect(theme.inputDecorationTheme.enabledBorder,
-            isA<OutlineInputBorder>());
+        expect(
+          theme.inputDecorationTheme.enabledBorder,
+          isA<OutlineInputBorder>(),
+        );
       });
 
       test('should have focused border', () {
-        expect(theme.inputDecorationTheme.focusedBorder,
-            isA<OutlineInputBorder>());
+        expect(
+          theme.inputDecorationTheme.focusedBorder,
+          isA<OutlineInputBorder>(),
+        );
       });
 
       test('should have error border', () {
         expect(
-            theme.inputDecorationTheme.errorBorder, isA<OutlineInputBorder>());
+          theme.inputDecorationTheme.errorBorder,
+          isA<OutlineInputBorder>(),
+        );
       });
 
       test('should have focused error border', () {
-        expect(theme.inputDecorationTheme.focusedErrorBorder,
-            isA<OutlineInputBorder>());
+        expect(
+          theme.inputDecorationTheme.focusedErrorBorder,
+          isA<OutlineInputBorder>(),
+        );
       });
 
       test('should have content padding', () {
@@ -240,6 +248,126 @@ void main() {
       test('should have 24px size', () {
         expect(theme.iconTheme.size, 24);
       });
+    });
+  });
+
+  group('darkTheme', () {
+    late ThemeData darkTheme;
+
+    setUp(() {
+      darkTheme = AppTheme.darkTheme;
+    });
+
+    group('General configuration', () {
+      test('should return a valid ThemeData', () {
+        expect(darkTheme, isA<ThemeData>());
+      });
+
+      test('should use Material 3', () {
+        expect(darkTheme.useMaterial3, isTrue);
+      });
+
+      test('should have a dark brightness color scheme', () {
+        expect(darkTheme.colorScheme.brightness, Brightness.dark);
+      });
+
+      test('should have primary color based on orange seed', () {
+        expect(darkTheme.colorScheme.primary, isNotNull);
+      });
+    });
+
+    group('ColorScheme', () {
+      test('should have all required colors', () {
+        final colorScheme = darkTheme.colorScheme;
+
+        expect(colorScheme.primary, isNotNull);
+        expect(colorScheme.onPrimary, isNotNull);
+        expect(colorScheme.secondary, isNotNull);
+        expect(colorScheme.onSecondary, isNotNull);
+        expect(colorScheme.surface, isNotNull);
+        expect(colorScheme.onSurface, isNotNull);
+        expect(colorScheme.error, isNotNull);
+        expect(colorScheme.onError, isNotNull);
+      });
+    });
+
+    group('AppBar theme', () {
+      test('should have centered title', () {
+        expect(darkTheme.appBarTheme.centerTitle, isTrue);
+      });
+
+      test('should have zero elevation', () {
+        expect(darkTheme.appBarTheme.elevation, 0);
+      });
+
+      test('should have surface background color', () {
+        expect(
+          darkTheme.appBarTheme.backgroundColor,
+          darkTheme.colorScheme.surface,
+        );
+      });
+    });
+
+    group('Card theme', () {
+      test('should have elevation', () {
+        expect(darkTheme.cardTheme.elevation, 1);
+      });
+
+      test('should have rounded corners', () {
+        final shape = darkTheme.cardTheme.shape as RoundedRectangleBorder;
+        expect(shape.borderRadius, BorderRadius.circular(12));
+      });
+    });
+
+    group('FloatingActionButton theme', () {
+      test('should have primary background color', () {
+        expect(
+          darkTheme.floatingActionButtonTheme.backgroundColor,
+          darkTheme.colorScheme.primary,
+        );
+      });
+
+      test('should have elevation', () {
+        expect(darkTheme.floatingActionButtonTheme.elevation, 4);
+      });
+    });
+
+    group('InputDecoration theme', () {
+      test('should be filled', () {
+        expect(darkTheme.inputDecorationTheme.filled, isTrue);
+      });
+
+      test('should have fill color', () {
+        expect(darkTheme.inputDecorationTheme.fillColor, isNotNull);
+      });
+    });
+  });
+
+  group('Light and Dark theme comparison', () {
+    test('should have different color scheme brightness', () {
+      expect(
+        AppTheme.lightTheme.colorScheme.brightness,
+        isNot(AppTheme.darkTheme.colorScheme.brightness),
+      );
+    });
+
+    test('should both use Material 3', () {
+      expect(AppTheme.lightTheme.useMaterial3, isTrue);
+      expect(AppTheme.darkTheme.useMaterial3, isTrue);
+    });
+
+    test('should have same structural properties', () {
+      // Card elevation should be same
+      expect(
+        AppTheme.lightTheme.cardTheme.elevation,
+        AppTheme.darkTheme.cardTheme.elevation,
+      );
+
+      // FAB elevation should be same
+      expect(
+        AppTheme.lightTheme.floatingActionButtonTheme.elevation,
+        AppTheme.darkTheme.floatingActionButtonTheme.elevation,
+      );
     });
   });
 

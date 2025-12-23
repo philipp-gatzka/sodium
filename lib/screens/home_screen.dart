@@ -11,6 +11,7 @@ import '../widgets/search_bar.dart';
 import '../widgets/sort_bottom_sheet.dart';
 import 'recipe_detail_screen.dart';
 import 'recipe_edit_screen.dart';
+import 'settings_screen.dart';
 
 /// Provider to track the current search query.
 final searchQueryProvider = StateProvider<String>((ref) => '');
@@ -70,6 +71,17 @@ class HomeScreen extends ConsumerWidget {
             },
             tooltip:
                 showFavoritesOnly ? 'Show all recipes' : 'Show favorites only',
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const SettingsScreen(),
+                ),
+              );
+            },
+            tooltip: 'Settings',
           ),
         ],
       ),
