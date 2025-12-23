@@ -15,11 +15,11 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            recipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
-            sortedRecipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
+            recipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
             sortOptionProvider
                 .overrideWith((ref) => RecipeSortOption.newestFirst),
-            allCategoriesProvider.overrideWith((ref) async => &lt;String>[]),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -36,11 +36,11 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            recipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
-            sortedRecipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
+            recipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
             sortOptionProvider
                 .overrideWith((ref) => RecipeSortOption.newestFirst),
-            allCategoriesProvider.overrideWith((ref) async => &lt;String>[]),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -57,11 +57,11 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            recipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
-            sortedRecipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
+            recipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
             sortOptionProvider
                 .overrideWith((ref) => RecipeSortOption.newestFirst),
-            allCategoriesProvider.overrideWith((ref) async => &lt;String>[]),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -79,14 +79,14 @@ void main() {
         ProviderScope(
           overrides: [
             recipesProvider.overrideWith((ref) {
-              return Future.value(&lt;Recipe>[]);
+              return Future.value(<Recipe>[]);
             }),
             sortedRecipesProvider.overrideWith((ref) {
-              return Future.value(&lt;Recipe>[]);
+              return Future.value(<Recipe>[]);
             }),
             sortOptionProvider
                 .overrideWith((ref) => RecipeSortOption.newestFirst),
-            allCategoriesProvider.overrideWith((ref) async => &lt;String>[]),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -104,11 +104,11 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            recipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
-            sortedRecipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
+            recipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
             sortOptionProvider
                 .overrideWith((ref) => RecipeSortOption.newestFirst),
-            allCategoriesProvider.overrideWith((ref) async => &lt;String>[]),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -145,7 +145,7 @@ void main() {
             sortedRecipesProvider.overrideWith((ref) async => recipes),
             sortOptionProvider
                 .overrideWith((ref) => RecipeSortOption.newestFirst),
-            allCategoriesProvider.overrideWith((ref) async => &lt;String>[]),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -172,7 +172,7 @@ void main() {
             }),
             sortOptionProvider
                 .overrideWith((ref) => RecipeSortOption.newestFirst),
-            allCategoriesProvider.overrideWith((ref) async => &lt;String>[]),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -206,7 +206,7 @@ void main() {
             sortedRecipesProvider.overrideWith((ref) async => recipes),
             sortOptionProvider
                 .overrideWith((ref) => RecipeSortOption.newestFirst),
-            allCategoriesProvider.overrideWith((ref) async => &lt;String>[]),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -223,11 +223,11 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            recipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
-            sortedRecipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
+            recipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
             sortOptionProvider
                 .overrideWith((ref) => RecipeSortOption.newestFirst),
-            allCategoriesProvider.overrideWith((ref) async => &lt;String>[]),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -244,11 +244,11 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            recipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
-            sortedRecipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
+            recipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
             sortOptionProvider
                 .overrideWith((ref) => RecipeSortOption.newestFirst),
-            allCategoriesProvider.overrideWith((ref) async => &lt;String>[]),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -266,11 +266,11 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            recipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
-            sortedRecipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
+            recipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
             sortOptionProvider
                 .overrideWith((ref) => RecipeSortOption.newestFirst),
-            allCategoriesProvider.overrideWith((ref) async => &lt;String>[]),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -290,11 +290,11 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            recipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
-            sortedRecipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
+            recipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
             sortOptionProvider
                 .overrideWith((ref) => RecipeSortOption.newestFirst),
-            allCategoriesProvider.overrideWith((ref) async => &lt;String>[]),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -313,11 +313,11 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              recipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
-              sortedRecipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
+              recipesProvider.overrideWith((ref) async => <Recipe>[]),
+              sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
               sortOptionProvider
                   .overrideWith((ref) => RecipeSortOption.newestFirst),
-              allCategoriesProvider.overrideWith((ref) async => &lt;String>[]),
+              allCategoriesProvider.overrideWith((ref) async => <String>[]),
             ],
             child: const MaterialApp(
               home: HomeScreen(),
@@ -335,12 +335,12 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              recipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
-              sortedRecipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
+              recipesProvider.overrideWith((ref) async => <Recipe>[]),
+              sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
               sortOptionProvider
                   .overrideWith((ref) => RecipeSortOption.newestFirst),
-              allCategoriesProvider.overrideWith((ref) async => &lt;String>[]),
-              favoriteRecipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
+              allCategoriesProvider.overrideWith((ref) async => <String>[]),
+              favoriteRecipesProvider.overrideWith((ref) async => <Recipe>[]),
             ],
             child: const MaterialApp(
               home: HomeScreen(),
@@ -377,12 +377,12 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              recipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
-              sortedRecipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
+              recipesProvider.overrideWith((ref) async => <Recipe>[]),
+              sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
               sortOptionProvider
                   .overrideWith((ref) => RecipeSortOption.newestFirst),
-              allCategoriesProvider.overrideWith((ref) async => &lt;String>[]),
-              favoriteRecipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
+              allCategoriesProvider.overrideWith((ref) async => <String>[]),
+              favoriteRecipesProvider.overrideWith((ref) async => <Recipe>[]),
               showFavoritesOnlyProvider.overrideWith((ref) => true),
             ],
             child: const MaterialApp(
@@ -415,11 +415,11 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              recipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
-              sortedRecipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
+              recipesProvider.overrideWith((ref) async => <Recipe>[]),
+              sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
               sortOptionProvider
                   .overrideWith((ref) => RecipeSortOption.newestFirst),
-              allCategoriesProvider.overrideWith((ref) async => &lt;String>[]),
+              allCategoriesProvider.overrideWith((ref) async => <String>[]),
               favoriteRecipesProvider
                   .overrideWith((ref) async => favoriteRecipes),
               showFavoritesOnlyProvider.overrideWith((ref) => true),
@@ -441,11 +441,11 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              recipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
-              sortedRecipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
+              recipesProvider.overrideWith((ref) async => <Recipe>[]),
+              sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
               sortOptionProvider
                   .overrideWith((ref) => RecipeSortOption.newestFirst),
-              allCategoriesProvider.overrideWith((ref) async => &lt;String>[]),
+              allCategoriesProvider.overrideWith((ref) async => <String>[]),
             ],
             child: const MaterialApp(
               home: HomeScreen(),
@@ -461,7 +461,7 @@ void main() {
         );
 
         expect(iconButton, findsOneWidget);
-        final widget = tester.widget&lt;IconButton>(iconButton);
+        final widget = tester.widget<IconButton>(iconButton);
         expect(widget.tooltip, 'Show favorites only');
       });
 
@@ -470,12 +470,12 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              recipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
-              sortedRecipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
+              recipesProvider.overrideWith((ref) async => <Recipe>[]),
+              sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
               sortOptionProvider
                   .overrideWith((ref) => RecipeSortOption.newestFirst),
-              allCategoriesProvider.overrideWith((ref) async => &lt;String>[]),
-              favoriteRecipesProvider.overrideWith((ref) async => &lt;Recipe>[]),
+              allCategoriesProvider.overrideWith((ref) async => <String>[]),
+              favoriteRecipesProvider.overrideWith((ref) async => <Recipe>[]),
               showFavoritesOnlyProvider.overrideWith((ref) => true),
             ],
             child: const MaterialApp(
@@ -492,7 +492,7 @@ void main() {
         );
 
         expect(iconButton, findsOneWidget);
-        final widget = tester.widget&lt;IconButton>(iconButton);
+        final widget = tester.widget<IconButton>(iconButton);
         expect(widget.tooltip, 'Show all recipes');
       });
     });
