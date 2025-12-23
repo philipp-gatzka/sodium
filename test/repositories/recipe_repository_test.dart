@@ -12,6 +12,7 @@ void main() {
     isar = await Isar.open(
       [RecipeSchema],
       directory: '',
+      name: 'recipe_repository_test',
     );
     repository = RecipeRepository(isar);
   });
