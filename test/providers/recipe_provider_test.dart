@@ -107,6 +107,9 @@ void main() {
     });
 
     test('should support search operations', () async {
+      // Clear any existing data first
+      await testIsar.writeTxn(() => testIsar.recipes.clear());
+
       final container = ProviderContainer(
         overrides: [
           isarProvider.overrideWith((ref) async => testIsar),
@@ -275,6 +278,9 @@ void main() {
     });
 
     test('should return matching recipes', () async {
+      // Clear any existing data first
+      await testIsar.writeTxn(() => testIsar.recipes.clear());
+
       final container = ProviderContainer(
         overrides: [
           isarProvider.overrideWith((ref) async => testIsar),
