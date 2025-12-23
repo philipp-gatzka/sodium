@@ -5,6 +5,7 @@ import 'package:sodium/models/recipe.dart';
 import 'package:sodium/providers/recipe_provider.dart';
 import 'package:sodium/screens/home_screen.dart';
 import 'package:sodium/widgets/empty_state.dart';
+import 'package:sodium/widgets/loading_widget.dart';
 import 'package:sodium/widgets/recipe_card.dart';
 
 void main() {
@@ -77,6 +78,7 @@ void main() {
       );
 
       // Initial pump shows loading state before async completes
+      expect(find.byType(LoadingWidget), findsOneWidget);
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
       // Now let it settle to complete
