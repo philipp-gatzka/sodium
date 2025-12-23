@@ -57,7 +57,8 @@ void main() {
 
       // Step 3: Fill in recipe details
       // Enter title
-      final titleField = find.widgetWithText(TextFormField, 'Enter recipe name');
+      final titleField =
+          find.widgetWithText(TextFormField, 'Enter recipe name');
       await tester.enterText(titleField, 'Test Chocolate Cake');
       await tester.pump();
 
