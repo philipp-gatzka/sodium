@@ -265,4 +265,140 @@ void main() {
       expect(recipes.first.title, equals('New Recipe'));
     });
   });
+
+  group('recipeSearchProvider', () {
+    test('should be a FutureProvider.family', () {
+      expect(
+        recipeSearchProvider,
+        isA<FutureProviderFamily<List<Recipe>, String>>(),
+      );
+    });
+
+    test('should return matching recipes', () async {
+      final container = ProviderContainer(
+        overrides: [
+          isarProvider.overrideWith((ref) async => testIsar),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(isarProvider.future);
+
+      final repository = container.read(recipeRepositoryProvider);
+      await repository.addRecipe(Recipe()
+        ..title = 'Chocolate Cake'
+        ..ingredients = []
+        ..instructions = []);
+      await repository.addRecipe(Recipe()
+        ..title = 'Vanilla Pudding'
+        ..ingredients = []
+        ..instructions = []);
+      await repository.addRecipe(Recipe()
+        ..title = 'Chocolate Mousse'
+        ..ingredients = []
+        ..instructions = []);
+
+      final results =
+          await container.read(recipeSearchProvider('Chocolate').future);
+
+      expect(results.length, equals(2));
+      expect(results.every((r) => r.title.contains('Chocolate')), isTrue);
+    });
+
+    test('should return empty list when no matches', () async {
+      final container = ProviderContainer(
+        overrides: [
+          isarProvider.overrideWith((ref) async => testIsar),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(isarProvider.future);
+
+      final repository = container.read(recipeRepositoryProvider);
+      await repository.addRecipe(Recipe()
+        ..title = 'Apple Pie'
+        ..ingredients = []
+        ..instructions = []);
+
+      final results =
+          await container.read(recipeSearchProvider('Chocolate').future);
+
+      expect(results, isEmpty);
+    });
+
+    test('should be case-insensitive', () async {
+      final container = ProviderContainer(
+        overrides: [
+          isarProvider.overrideWith((ref) async => testIsar),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(isarProvider.future);
+
+      final repository = container.read(recipeRepositoryProvider);
+      await repository.addRecipe(Recipe()
+        ..title = 'CHOCOLATE CAKE'
+        ..ingredients = []
+        ..instructions = []);
+      await repository.addRecipe(Recipe()
+        ..title = 'chocolate mousse'
+        ..ingredients = []
+        ..instructions = []);
+
+      final results =
+          await container.read(recipeSearchProvider('ChOcOlAtE').future);
+
+      expect(results.length, equals(2));
+    });
+
+    test('should return all recipes for empty query', () async {
+      final container = ProviderContainer(
+        overrides: [
+          isarProvider.overrideWith((ref) async => testIsar),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(isarProvider.future);
+
+      final repository = container.read(recipeRepositoryProvider);
+      await repository.addRecipe(Recipe()
+        ..title = 'Recipe 1'
+        ..ingredients = []
+        ..instructions = []);
+      await repository.addRecipe(Recipe()
+        ..title = 'Recipe 2'
+        ..ingredients = []
+        ..instructions = []);
+
+      final results = await container.read(recipeSearchProvider('').future);
+
+      expect(results.length, equals(2));
+    });
+
+    test('should trim whitespace from query', () async {
+      final container = ProviderContainer(
+        overrides: [
+          isarProvider.overrideWith((ref) async => testIsar),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(isarProvider.future);
+
+      final repository = container.read(recipeRepositoryProvider);
+      await repository.addRecipe(Recipe()
+        ..title = 'Chocolate Cake'
+        ..ingredients = []
+        ..instructions = []);
+
+      final results =
+          await container.read(recipeSearchProvider('  Chocolate  ').future);
+
+      expect(results.length, equals(1));
+      expect(results.first.title, equals('Chocolate Cake'));
+    });
+  });
 }
