@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/recipe_provider.dart';
 import '../widgets/loading_widget.dart';
+import 'recipe_edit_screen.dart';
 
 /// Screen that displays the details of a single recipe.
 ///
@@ -100,6 +101,21 @@ class RecipeDetailScreen extends ConsumerWidget {
         return Scaffold(
           appBar: AppBar(
             title: Text(recipe.title),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.edit),
+                onPressed: () async {
+                  await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => RecipeEditScreen(recipeId: recipeId),
+                    ),
+                  );
+                  // Refresh recipe data after editing
+                  ref.invalidate(recipeByIdProvider(recipeId));
+                },
+                tooltip: 'Edit recipe',
+              ),
+            ],
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
