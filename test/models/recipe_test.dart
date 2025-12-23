@@ -351,5 +351,320 @@ void main() {
         expect(recipe.instructions.first.contains('\n'), isTrue);
       });
     });
+
+    group('Description field', () {
+      test('should have null description by default', () {
+        final recipe = Recipe();
+
+        expect(recipe.description, isNull);
+      });
+
+      test('should accept description', () {
+        final recipe = Recipe()..description = 'A delicious recipe';
+
+        expect(recipe.description, 'A delicious recipe');
+      });
+
+      test('should accept long description', () {
+        final longDesc = 'A' * 5000;
+        final recipe = Recipe()..description = longDesc;
+
+        expect(recipe.description?.length, 5000);
+      });
+    });
+
+    group('Time fields', () {
+      test('should have null prepTimeMinutes by default', () {
+        final recipe = Recipe();
+
+        expect(recipe.prepTimeMinutes, isNull);
+      });
+
+      test('should accept prepTimeMinutes', () {
+        final recipe = Recipe()..prepTimeMinutes = 15;
+
+        expect(recipe.prepTimeMinutes, 15);
+      });
+
+      test('should have null cookTimeMinutes by default', () {
+        final recipe = Recipe();
+
+        expect(recipe.cookTimeMinutes, isNull);
+      });
+
+      test('should accept cookTimeMinutes', () {
+        final recipe = Recipe()..cookTimeMinutes = 30;
+
+        expect(recipe.cookTimeMinutes, 30);
+      });
+
+      test('should accept zero for time fields', () {
+        final recipe = Recipe()
+          ..prepTimeMinutes = 0
+          ..cookTimeMinutes = 0;
+
+        expect(recipe.prepTimeMinutes, 0);
+        expect(recipe.cookTimeMinutes, 0);
+      });
+    });
+
+    group('Servings field', () {
+      test('should have null servings by default', () {
+        final recipe = Recipe();
+
+        expect(recipe.servings, isNull);
+      });
+
+      test('should accept servings', () {
+        final recipe = Recipe()..servings = 4;
+
+        expect(recipe.servings, 4);
+      });
+
+      test('should accept single serving', () {
+        final recipe = Recipe()..servings = 1;
+
+        expect(recipe.servings, 1);
+      });
+
+      test('should accept large serving count', () {
+        final recipe = Recipe()..servings = 100;
+
+        expect(recipe.servings, 100);
+      });
+    });
+
+    group('Difficulty field', () {
+      test('should have null difficulty by default', () {
+        final recipe = Recipe();
+
+        expect(recipe.difficulty, isNull);
+        expect(recipe.difficultyValue, 0);
+      });
+
+      test('should accept easy difficulty', () {
+        final recipe = Recipe()..difficulty = RecipeDifficulty.easy;
+
+        expect(recipe.difficulty, RecipeDifficulty.easy);
+        expect(recipe.difficultyValue, 1);
+      });
+
+      test('should accept medium difficulty', () {
+        final recipe = Recipe()..difficulty = RecipeDifficulty.medium;
+
+        expect(recipe.difficulty, RecipeDifficulty.medium);
+        expect(recipe.difficultyValue, 2);
+      });
+
+      test('should accept hard difficulty', () {
+        final recipe = Recipe()..difficulty = RecipeDifficulty.hard;
+
+        expect(recipe.difficulty, RecipeDifficulty.hard);
+        expect(recipe.difficultyValue, 3);
+      });
+
+      test('should allow clearing difficulty to null', () {
+        final recipe = Recipe()
+          ..difficulty = RecipeDifficulty.hard
+          ..difficulty = null;
+
+        expect(recipe.difficulty, isNull);
+        expect(recipe.difficultyValue, 0);
+      });
+    });
+
+    group('Favorite field', () {
+      test('should have false isFavorite by default', () {
+        final recipe = Recipe();
+
+        expect(recipe.isFavorite, false);
+      });
+
+      test('should accept true isFavorite', () {
+        final recipe = Recipe()..isFavorite = true;
+
+        expect(recipe.isFavorite, true);
+      });
+
+      test('should allow toggling isFavorite', () {
+        final recipe = Recipe();
+        expect(recipe.isFavorite, false);
+
+        recipe.isFavorite = true;
+        expect(recipe.isFavorite, true);
+
+        recipe.isFavorite = false;
+        expect(recipe.isFavorite, false);
+      });
+    });
+
+    group('Categories field', () {
+      test('should have empty categories by default', () {
+        final recipe = Recipe();
+
+        expect(recipe.categories, isEmpty);
+      });
+
+      test('should accept single category', () {
+        final recipe = Recipe()..categories = ['Dessert'];
+
+        expect(recipe.categories, ['Dessert']);
+      });
+
+      test('should accept multiple categories', () {
+        final recipe = Recipe()..categories = ['Breakfast', 'Quick', 'Healthy'];
+
+        expect(recipe.categories.length, 3);
+        expect(recipe.categories, contains('Breakfast'));
+        expect(recipe.categories, contains('Quick'));
+        expect(recipe.categories, contains('Healthy'));
+      });
+
+      test('should preserve category order', () {
+        final recipe = Recipe()..categories = ['A', 'B', 'C'];
+
+        expect(recipe.categories[0], 'A');
+        expect(recipe.categories[1], 'B');
+        expect(recipe.categories[2], 'C');
+      });
+
+      test('should allow adding to categories', () {
+        final recipe = Recipe()..categories = ['Dinner'];
+        recipe.categories.add('Italian');
+
+        expect(recipe.categories, contains('Italian'));
+      });
+    });
+
+    group('totalTimeMinutes getter', () {
+      test('should return null when both times are null', () {
+        final recipe = Recipe();
+
+        expect(recipe.totalTimeMinutes, isNull);
+      });
+
+      test('should return prep time when cook time is null', () {
+        final recipe = Recipe()..prepTimeMinutes = 15;
+
+        expect(recipe.totalTimeMinutes, 15);
+      });
+
+      test('should return cook time when prep time is null', () {
+        final recipe = Recipe()..cookTimeMinutes = 30;
+
+        expect(recipe.totalTimeMinutes, 30);
+      });
+
+      test('should return sum of both times', () {
+        final recipe = Recipe()
+          ..prepTimeMinutes = 15
+          ..cookTimeMinutes = 30;
+
+        expect(recipe.totalTimeMinutes, 45);
+      });
+
+      test('should handle zero times', () {
+        final recipe = Recipe()
+          ..prepTimeMinutes = 0
+          ..cookTimeMinutes = 0;
+
+        expect(recipe.totalTimeMinutes, 0);
+      });
+    });
+
+    group('formattedTotalTime getter', () {
+      test('should return null when total time is null', () {
+        final recipe = Recipe();
+
+        expect(recipe.formattedTotalTime, isNull);
+      });
+
+      test('should format minutes only', () {
+        final recipe = Recipe()..prepTimeMinutes = 30;
+
+        expect(recipe.formattedTotalTime, '30 min');
+      });
+
+      test('should format hours only', () {
+        final recipe = Recipe()..cookTimeMinutes = 120;
+
+        expect(recipe.formattedTotalTime, '2 hr');
+      });
+
+      test('should format hours and minutes', () {
+        final recipe = Recipe()
+          ..prepTimeMinutes = 15
+          ..cookTimeMinutes = 75;
+
+        expect(recipe.formattedTotalTime, '1 hr 30 min');
+      });
+
+      test('should handle zero time', () {
+        final recipe = Recipe()..prepTimeMinutes = 0;
+
+        expect(recipe.formattedTotalTime, '0 min');
+      });
+    });
+
+    group('difficultyDisplay getter', () {
+      test('should return null when difficulty is null', () {
+        final recipe = Recipe();
+
+        expect(recipe.difficultyDisplay, isNull);
+      });
+
+      test('should return Easy for easy difficulty', () {
+        final recipe = Recipe()..difficulty = RecipeDifficulty.easy;
+
+        expect(recipe.difficultyDisplay, 'Easy');
+      });
+
+      test('should return Medium for medium difficulty', () {
+        final recipe = Recipe()..difficulty = RecipeDifficulty.medium;
+
+        expect(recipe.difficultyDisplay, 'Medium');
+      });
+
+      test('should return Hard for hard difficulty', () {
+        final recipe = Recipe()..difficulty = RecipeDifficulty.hard;
+
+        expect(recipe.difficultyDisplay, 'Hard');
+      });
+    });
+
+    group('Complete recipe with all fields', () {
+      test('should create recipe with all fields populated', () {
+        final now = DateTime.now();
+        final recipe = Recipe()
+          ..title = 'Complete Recipe'
+          ..description = 'A complete recipe with all fields'
+          ..ingredients = ['ingredient 1', 'ingredient 2']
+          ..instructions = ['step 1', 'step 2']
+          ..prepTimeMinutes = 15
+          ..cookTimeMinutes = 45
+          ..servings = 4
+          ..difficulty = RecipeDifficulty.medium
+          ..isFavorite = true
+          ..categories = ['Dinner', 'Italian']
+          ..createdAt = now
+          ..updatedAt = now;
+
+        expect(recipe.title, 'Complete Recipe');
+        expect(recipe.description, 'A complete recipe with all fields');
+        expect(recipe.ingredients.length, 2);
+        expect(recipe.instructions.length, 2);
+        expect(recipe.prepTimeMinutes, 15);
+        expect(recipe.cookTimeMinutes, 45);
+        expect(recipe.totalTimeMinutes, 60);
+        expect(recipe.formattedTotalTime, '1 hr');
+        expect(recipe.servings, 4);
+        expect(recipe.difficulty, RecipeDifficulty.medium);
+        expect(recipe.difficultyDisplay, 'Medium');
+        expect(recipe.isFavorite, true);
+        expect(recipe.categories.length, 2);
+        expect(recipe.createdAt, now);
+        expect(recipe.updatedAt, now);
+      });
+    });
   });
 }
