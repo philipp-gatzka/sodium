@@ -70,17 +70,15 @@ class SortBottomSheet extends StatelessWidget {
             return ListTile(
               leading: Icon(
                 _getIconForOption(option),
-                color: isSelected
-                    ? Theme.of(context).colorScheme.primary
-                    : null,
+                color:
+                    isSelected ? Theme.of(context).colorScheme.primary : null,
               ),
               title: Text(
                 option.displayName,
                 style: TextStyle(
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  color: isSelected
-                      ? Theme.of(context).colorScheme.primary
-                      : null,
+                  color:
+                      isSelected ? Theme.of(context).colorScheme.primary : null,
                 ),
               ),
               trailing: isSelected
