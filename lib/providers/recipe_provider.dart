@@ -21,3 +21,14 @@ final recipesProvider = FutureProvider<List<Recipe>>((ref) async {
   final repository = ref.watch(recipeRepositoryProvider);
   return repository.getAllRecipes();
 });
+
+/// Provider that searches for recipes by title.
+///
+/// Takes a search query as parameter and returns matching recipes.
+/// The search is case-insensitive. Returns all recipes for empty query.
+/// Results are sorted by creation date (newest first).
+final recipeSearchProvider =
+    FutureProvider.family<List<Recipe>, String>((ref, query) async {
+  final repository = ref.watch(recipeRepositoryProvider);
+  return repository.searchRecipes(query);
+});
