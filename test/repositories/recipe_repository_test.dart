@@ -387,5 +387,300 @@ void main() {
         expect(results[0].title, equals('Chocolate Cake'));
       });
     });
+
+    group('getFavoriteRecipes', () {
+      test('should return empty list when no favorites exist', () async {
+        await repository.addRecipe(Recipe()
+          ..title = 'Regular Recipe'
+          ..ingredients = []
+          ..instructions = []);
+
+        final favorites = await repository.getFavoriteRecipes();
+
+        expect(favorites, isEmpty);
+      });
+
+      test('should return only favorite recipes', () async {
+        await repository.addRecipe(Recipe()
+          ..title = 'Regular Recipe'
+          ..ingredients = []
+          ..instructions = []);
+        await repository.addRecipe(Recipe()
+          ..title = 'Favorite Recipe 1'
+          ..ingredients = []
+          ..instructions = []
+          ..isFavorite = true);
+        await repository.addRecipe(Recipe()
+          ..title = 'Favorite Recipe 2'
+          ..ingredients = []
+          ..instructions = []
+          ..isFavorite = true);
+
+        final favorites = await repository.getFavoriteRecipes();
+
+        expect(favorites.length, equals(2));
+        expect(favorites.every((r) => r.isFavorite), isTrue);
+      });
+
+      test('should return favorites sorted by createdAt descending', () async {
+        await repository.addRecipe(Recipe()
+          ..title = 'First Favorite'
+          ..ingredients = []
+          ..instructions = []
+          ..isFavorite = true);
+
+        await Future.delayed(const Duration(milliseconds: 10));
+
+        await repository.addRecipe(Recipe()
+          ..title = 'Second Favorite'
+          ..ingredients = []
+          ..instructions = []
+          ..isFavorite = true);
+
+        final favorites = await repository.getFavoriteRecipes();
+
+        expect(favorites[0].title, equals('Second Favorite'));
+        expect(favorites[1].title, equals('First Favorite'));
+      });
+    });
+
+    group('toggleFavorite', () {
+      test('should toggle favorite from false to true', () async {
+        final recipe = await repository.addRecipe(Recipe()
+          ..title = 'Test Recipe'
+          ..ingredients = []
+          ..instructions = []);
+
+        expect(recipe.isFavorite, isFalse);
+
+        final toggled = await repository.toggleFavorite(recipe.id);
+
+        expect(toggled.isFavorite, isTrue);
+      });
+
+      test('should toggle favorite from true to false', () async {
+        final recipe = await repository.addRecipe(Recipe()
+          ..title = 'Test Recipe'
+          ..ingredients = []
+          ..instructions = []
+          ..isFavorite = true);
+
+        expect(recipe.isFavorite, isTrue);
+
+        final toggled = await repository.toggleFavorite(recipe.id);
+
+        expect(toggled.isFavorite, isFalse);
+      });
+
+      test('should persist favorite change to database', () async {
+        final recipe = await repository.addRecipe(Recipe()
+          ..title = 'Test Recipe'
+          ..ingredients = []
+          ..instructions = []);
+
+        await repository.toggleFavorite(recipe.id);
+        final retrieved = await repository.getRecipeById(recipe.id);
+
+        expect(retrieved!.isFavorite, isTrue);
+      });
+
+      test('should update updatedAt timestamp', () async {
+        final recipe = await repository.addRecipe(Recipe()
+          ..title = 'Test Recipe'
+          ..ingredients = []
+          ..instructions = []);
+
+        final originalUpdatedAt = recipe.updatedAt;
+        await Future.delayed(const Duration(milliseconds: 10));
+
+        final toggled = await repository.toggleFavorite(recipe.id);
+
+        expect(toggled.updatedAt!.isAfter(originalUpdatedAt!), isTrue);
+      });
+
+      test('should throw StateError for non-existent ID', () async {
+        expect(
+          () => repository.toggleFavorite(99999),
+          throwsA(isA<StateError>()),
+        );
+      });
+    });
+
+    group('getRecipesByCategory', () {
+      test('should return recipes with matching category', () async {
+        await repository.addRecipe(Recipe()
+          ..title = 'Italian Pasta'
+          ..ingredients = []
+          ..instructions = []
+          ..categories = ['Italian', 'Dinner']);
+        await repository.addRecipe(Recipe()
+          ..title = 'Mexican Tacos'
+          ..ingredients = []
+          ..instructions = []
+          ..categories = ['Mexican', 'Dinner']);
+        await repository.addRecipe(Recipe()
+          ..title = 'Italian Pizza'
+          ..ingredients = []
+          ..instructions = []
+          ..categories = ['Italian', 'Lunch']);
+
+        final results = await repository.getRecipesByCategory('Italian');
+
+        expect(results.length, equals(2));
+        expect(results.every((r) => r.categories.contains('Italian')), isTrue);
+      });
+
+      test('should return empty list when no recipes match category', () async {
+        await repository.addRecipe(Recipe()
+          ..title = 'Test Recipe'
+          ..ingredients = []
+          ..instructions = []
+          ..categories = ['Breakfast']);
+
+        final results = await repository.getRecipesByCategory('Dinner');
+
+        expect(results, isEmpty);
+      });
+
+      test('should be case-insensitive', () async {
+        await repository.addRecipe(Recipe()
+          ..title = 'Test Recipe'
+          ..ingredients = []
+          ..instructions = []
+          ..categories = ['Dessert']);
+
+        final results = await repository.getRecipesByCategory('DESSERT');
+
+        expect(results.length, equals(1));
+      });
+
+      test('should return all recipes for empty category', () async {
+        await repository.addRecipe(Recipe()
+          ..title = 'Recipe 1'
+          ..ingredients = []
+          ..instructions = []
+          ..categories = ['A']);
+        await repository.addRecipe(Recipe()
+          ..title = 'Recipe 2'
+          ..ingredients = []
+          ..instructions = []
+          ..categories = ['B']);
+
+        final results = await repository.getRecipesByCategory('');
+
+        expect(results.length, equals(2));
+      });
+    });
+
+    group('getAllCategories', () {
+      test('should return empty list when no recipes exist', () async {
+        final categories = await repository.getAllCategories();
+
+        expect(categories, isEmpty);
+      });
+
+      test('should return empty list when recipes have no categories',
+          () async {
+        await repository.addRecipe(Recipe()
+          ..title = 'Test Recipe'
+          ..ingredients = []
+          ..instructions = []);
+
+        final categories = await repository.getAllCategories();
+
+        expect(categories, isEmpty);
+      });
+
+      test('should return unique categories', () async {
+        await repository.addRecipe(Recipe()
+          ..title = 'Recipe 1'
+          ..ingredients = []
+          ..instructions = []
+          ..categories = ['Dinner', 'Italian']);
+        await repository.addRecipe(Recipe()
+          ..title = 'Recipe 2'
+          ..ingredients = []
+          ..instructions = []
+          ..categories = ['Dinner', 'Quick']);
+
+        final categories = await repository.getAllCategories();
+
+        expect(categories.length, equals(3));
+        expect(categories, containsAll(['Dinner', 'Italian', 'Quick']));
+      });
+
+      test('should return categories sorted alphabetically', () async {
+        await repository.addRecipe(Recipe()
+          ..title = 'Test Recipe'
+          ..ingredients = []
+          ..instructions = []
+          ..categories = ['Zebra', 'Apple', 'Mango']);
+
+        final categories = await repository.getAllCategories();
+
+        expect(categories, orderedEquals(['Apple', 'Mango', 'Zebra']));
+      });
+    });
+
+    group('getRecipeCount', () {
+      test('should return 0 when no recipes exist', () async {
+        final count = await repository.getRecipeCount();
+
+        expect(count, equals(0));
+      });
+
+      test('should return correct count', () async {
+        await repository.addRecipe(Recipe()
+          ..title = 'Recipe 1'
+          ..ingredients = []
+          ..instructions = []);
+        await repository.addRecipe(Recipe()
+          ..title = 'Recipe 2'
+          ..ingredients = []
+          ..instructions = []);
+        await repository.addRecipe(Recipe()
+          ..title = 'Recipe 3'
+          ..ingredients = []
+          ..instructions = []);
+
+        final count = await repository.getRecipeCount();
+
+        expect(count, equals(3));
+      });
+    });
+
+    group('getFavoriteCount', () {
+      test('should return 0 when no favorites exist', () async {
+        await repository.addRecipe(Recipe()
+          ..title = 'Regular Recipe'
+          ..ingredients = []
+          ..instructions = []);
+
+        final count = await repository.getFavoriteCount();
+
+        expect(count, equals(0));
+      });
+
+      test('should return correct favorite count', () async {
+        await repository.addRecipe(Recipe()
+          ..title = 'Regular Recipe'
+          ..ingredients = []
+          ..instructions = []);
+        await repository.addRecipe(Recipe()
+          ..title = 'Favorite 1'
+          ..ingredients = []
+          ..instructions = []
+          ..isFavorite = true);
+        await repository.addRecipe(Recipe()
+          ..title = 'Favorite 2'
+          ..ingredients = []
+          ..instructions = []
+          ..isFavorite = true);
+
+        final count = await repository.getFavoriteCount();
+
+        expect(count, equals(2));
+      });
+    });
   });
 }

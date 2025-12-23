@@ -79,4 +79,76 @@ class RecipeRepository {
         .sortByCreatedAtDesc()
         .findAll();
   }
+
+  /// Retrieves all favorite recipes.
+  ///
+  /// Returns recipes where [isFavorite] is true, sorted by [createdAt] descending.
+  Future<List<Recipe>> getFavoriteRecipes() async {
+    return await _isar.recipes
+        .filter()
+        .isFavoriteEqualTo(true)
+        .sortByCreatedAtDesc()
+        .findAll();
+  }
+
+  /// Toggles the favorite status of a recipe.
+  ///
+  /// Returns the updated recipe with the new favorite status.
+  Future<Recipe> toggleFavorite(int id) async {
+    final recipe = await _isar.recipes.get(id);
+    if (recipe == null) {
+      throw StateError('Recipe with id $id not found');
+    }
+
+    recipe.isFavorite = !recipe.isFavorite;
+    recipe.updatedAt = DateTime.now();
+
+    await _isar.writeTxn(() async {
+      await _isar.recipes.put(recipe);
+    });
+
+    return recipe;
+  }
+
+  /// Retrieves all recipes in a specific category.
+  ///
+  /// The category match is case-insensitive.
+  /// Results are sorted by [createdAt] descending.
+  Future<List<Recipe>> getRecipesByCategory(String category) async {
+    final trimmedCategory = category.trim().toLowerCase();
+    if (trimmedCategory.isEmpty) {
+      return getAllRecipes();
+    }
+
+    return await _isar.recipes
+        .filter()
+        .categoriesElementContains(trimmedCategory, caseSensitive: false)
+        .sortByCreatedAtDesc()
+        .findAll();
+  }
+
+  /// Retrieves all unique categories used across all recipes.
+  ///
+  /// Returns a sorted list of unique category names.
+  Future<List<String>> getAllCategories() async {
+    final recipes = await _isar.recipes.where().findAll();
+    final categories = <String>{};
+
+    for (final recipe in recipes) {
+      categories.addAll(recipe.categories);
+    }
+
+    final sortedCategories = categories.toList()..sort();
+    return sortedCategories;
+  }
+
+  /// Counts the total number of recipes.
+  Future<int> getRecipeCount() async {
+    return await _isar.recipes.count();
+  }
+
+  /// Counts the number of favorite recipes.
+  Future<int> getFavoriteCount() async {
+    return await _isar.recipes.filter().isFavoriteEqualTo(true).count();
+  }
 }
