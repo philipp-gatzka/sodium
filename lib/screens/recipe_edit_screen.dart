@@ -18,10 +18,28 @@ class RecipeEditScreen extends ConsumerStatefulWidget {
 }
 
 class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _titleController = TextEditingController();
+
   bool get isEditMode => widget.recipeId != null;
 
+  @override
+  void dispose() {
+    _titleController.dispose();
+    super.dispose();
+  }
+
   void _onSave() {
-    // TODO: Implement save functionality
+    if (_formKey.currentState!.validate()) {
+      // TODO: Implement save functionality
+    }
+  }
+
+  String? _validateTitle(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Please enter a recipe title';
+    }
+    return null;
   }
 
   @override
@@ -36,16 +54,26 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
           ),
         ],
       ),
-      body: const SingleChildScrollView(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // TODO: Add form fields
-            Center(
-              child: Text('Recipe form will go here'),
-            ),
-          ],
+      body: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextFormField(
+                controller: _titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Recipe Title',
+                  hintText: 'Enter recipe name',
+                  border: OutlineInputBorder(),
+                ),
+                validator: _validateTitle,
+                textInputAction: TextInputAction.next,
+              ),
+              // TODO: Add more form fields
+            ],
+          ),
         ),
       ),
     );

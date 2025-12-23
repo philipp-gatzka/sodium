@@ -109,6 +109,109 @@ void main() {
       });
     });
 
+    group('Title input field', () {
+      testWidgets('should have a title text field', (tester) async {
+        await tester.pumpWidget(
+          const ProviderScope(
+            child: MaterialApp(
+              home: RecipeEditScreen(),
+            ),
+          ),
+        );
+
+        expect(find.byType(TextFormField), findsOneWidget);
+      });
+
+      testWidgets('should have label text', (tester) async {
+        await tester.pumpWidget(
+          const ProviderScope(
+            child: MaterialApp(
+              home: RecipeEditScreen(),
+            ),
+          ),
+        );
+
+        expect(find.text('Recipe Title'), findsOneWidget);
+      });
+
+      testWidgets('should have hint text', (tester) async {
+        await tester.pumpWidget(
+          const ProviderScope(
+            child: MaterialApp(
+              home: RecipeEditScreen(),
+            ),
+          ),
+        );
+
+        expect(find.text('Enter recipe name'), findsOneWidget);
+      });
+
+      testWidgets('should accept text input', (tester) async {
+        await tester.pumpWidget(
+          const ProviderScope(
+            child: MaterialApp(
+              home: RecipeEditScreen(),
+            ),
+          ),
+        );
+
+        await tester.enterText(find.byType(TextFormField), 'My Recipe');
+        await tester.pump();
+
+        expect(find.text('My Recipe'), findsOneWidget);
+      });
+
+      testWidgets('should show validation error when empty on save',
+          (tester) async {
+        await tester.pumpWidget(
+          const ProviderScope(
+            child: MaterialApp(
+              home: RecipeEditScreen(),
+            ),
+          ),
+        );
+
+        // Tap save without entering title
+        await tester.tap(find.byIcon(Icons.check));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Please enter a recipe title'), findsOneWidget);
+      });
+
+      testWidgets('should not show error when title is entered',
+          (tester) async {
+        await tester.pumpWidget(
+          const ProviderScope(
+            child: MaterialApp(
+              home: RecipeEditScreen(),
+            ),
+          ),
+        );
+
+        // Enter title
+        await tester.enterText(find.byType(TextFormField), 'Valid Title');
+        await tester.pump();
+
+        // Tap save
+        await tester.tap(find.byIcon(Icons.check));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Please enter a recipe title'), findsNothing);
+      });
+
+      testWidgets('should have Form widget', (tester) async {
+        await tester.pumpWidget(
+          const ProviderScope(
+            child: MaterialApp(
+              home: RecipeEditScreen(),
+            ),
+          ),
+        );
+
+        expect(find.byType(Form), findsOneWidget);
+      });
+    });
+
     testWidgets('should support back navigation', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
