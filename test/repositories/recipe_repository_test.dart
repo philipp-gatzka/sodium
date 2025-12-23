@@ -48,7 +48,8 @@ void main() {
 
         expect(result.createdAt, isNotNull);
         expect(
-          result.createdAt!.isAfter(beforeSave.subtract(const Duration(seconds: 1))),
+          result.createdAt!
+              .isAfter(beforeSave.subtract(const Duration(seconds: 1))),
           isTrue,
         );
         expect(
@@ -69,7 +70,8 @@ void main() {
 
         expect(result.updatedAt, isNotNull);
         expect(
-          result.updatedAt!.isAfter(beforeSave.subtract(const Duration(seconds: 1))),
+          result.updatedAt!
+              .isAfter(beforeSave.subtract(const Duration(seconds: 1))),
           isTrue,
         );
         expect(
