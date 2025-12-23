@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/recipe.dart';
 import '../providers/recipe_provider.dart';
 import '../utils/input_validator.dart';
+import '../widgets/category_selector.dart';
 import '../widgets/ingredients_input.dart';
 import '../widgets/instructions_input.dart';
 
@@ -28,6 +29,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
   final _titleController = TextEditingController();
   List<String> _ingredients = [];
   List<String> _instructions = [];
+  List<String> _categories = [];
   bool _isSaving = false;
   bool _isLoading = false;
   String? _loadError;
@@ -56,6 +58,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
           _titleController.text = recipe.title;
           _ingredients = List.from(recipe.ingredients);
           _instructions = List.from(recipe.instructions);
+          _categories = List.from(recipe.categories);
           _isLoading = false;
         });
       } else if (mounted) {
@@ -124,7 +127,8 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
         ..title = _titleController.text.trim()
         ..ingredients = _ingredients.where((i) => i.trim().isNotEmpty).toList()
         ..instructions =
-            _instructions.where((i) => i.trim().isNotEmpty).toList();
+            _instructions.where((i) => i.trim().isNotEmpty).toList()
+        ..categories = _categories;
 
       if (isEditMode) {
         recipe.id = widget.recipeId!;
@@ -133,8 +137,9 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
         await repository.addRecipe(recipe);
       }
 
-      // Invalidate the recipes provider to refresh the list
+      // Invalidate providers to refresh data
       ref.invalidate(recipesProvider);
+      ref.invalidate(allCategoriesProvider);
 
       if (mounted) {
         Navigator.of(context).pop();
@@ -262,6 +267,15 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
                 initialInstructions: _instructions,
                 onChange: (instructions) {
                   _instructions = instructions;
+                },
+              ),
+              const SizedBox(height: 24),
+              CategorySelector(
+                selectedCategories: _categories,
+                onChanged: (categories) {
+                  setState(() {
+                    _categories = categories;
+                  });
                 },
               ),
             ],

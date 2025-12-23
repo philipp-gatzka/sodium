@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/recipe_provider.dart';
 import '../utils/input_validator.dart';
+import '../widgets/category_filter_chips.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/recipe_card.dart';
@@ -21,6 +22,8 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final searchQuery = ref.watch(searchQueryProvider);
     final showFavoritesOnly = ref.watch(showFavoritesOnlyProvider);
+    final selectedCategory = ref.watch(selectedCategoryProvider);
+    final categoriesAsync = ref.watch(allCategoriesProvider);
 
     // Determine which provider to use based on filters
     final AsyncValue<List> recipesAsync;
@@ -28,6 +31,8 @@ class HomeScreen extends ConsumerWidget {
       recipesAsync = ref.watch(favoriteRecipesProvider);
     } else if (searchQuery.isNotEmpty) {
       recipesAsync = ref.watch(recipeSearchProvider(searchQuery));
+    } else if (selectedCategory != null) {
+      recipesAsync = ref.watch(recipesByCategoryProvider(selectedCategory));
     } else {
       recipesAsync = ref.watch(recipesProvider);
     }
@@ -62,6 +67,7 @@ class HomeScreen extends ConsumerWidget {
           // Refresh the list after returning
           ref.invalidate(recipesProvider);
           ref.invalidate(favoriteRecipesProvider);
+          ref.invalidate(allCategoriesProvider);
         },
         child: const Icon(Icons.add),
       ),
@@ -72,9 +78,32 @@ class HomeScreen extends ConsumerWidget {
             child: RecipeSearchBar(
               onSearch: (query) {
                 ref.read(searchQueryProvider.notifier).state = query;
+                // Clear category filter when searching
+                if (query.isNotEmpty) {
+                  ref.read(selectedCategoryProvider.notifier).state = null;
+                }
               },
             ),
           ),
+          // Show category filter chips when not searching and not showing favorites only
+          if (searchQuery.isEmpty && !showFavoritesOnly)
+            categoriesAsync.when(
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
+              data: (categories) => categories.isEmpty
+                  ? const SizedBox.shrink()
+                  : Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: CategoryFilterChips(
+                        categories: categories,
+                        selectedCategory: selectedCategory,
+                        onCategorySelected: (category) {
+                          ref.read(selectedCategoryProvider.notifier).state =
+                              category;
+                        },
+                      ),
+                    ),
+            ),
           Expanded(
             child: recipesAsync.when(
               loading: () => const LoadingWidget(),
@@ -130,6 +159,14 @@ class HomeScreen extends ConsumerWidget {
                           'Tap the heart icon on a recipe to add it to favorites',
                     );
                   }
+                  if (selectedCategory != null) {
+                    return EmptyState(
+                      icon: Icons.category_outlined,
+                      primaryMessage: 'No recipes in this category',
+                      secondaryMessage:
+                          'Add recipes to "$selectedCategory" or select a different category',
+                    );
+                  }
                   return const EmptyState(
                     icon: Icons.restaurant_menu,
                     primaryMessage: 'No recipes yet',
@@ -156,6 +193,7 @@ class HomeScreen extends ConsumerWidget {
                           // Refresh the list after returning (recipe might have been deleted or favorited)
                           ref.invalidate(recipesProvider);
                           ref.invalidate(favoriteRecipesProvider);
+                          ref.invalidate(allCategoriesProvider);
                         },
                       ),
                     );

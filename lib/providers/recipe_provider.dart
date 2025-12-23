@@ -52,3 +52,26 @@ final favoriteRecipesProvider = FutureProvider<List<Recipe>>((ref) async {
 
 /// Provider to track whether the home screen shows only favorites.
 final showFavoritesOnlyProvider = StateProvider<bool>((ref) => false);
+
+/// Provider that fetches all unique categories from recipes.
+///
+/// Returns a sorted list of category names used across all recipes.
+final allCategoriesProvider = FutureProvider<List<String>>((ref) async {
+  final repository = ref.watch(recipeRepositoryProvider);
+  return repository.getAllCategories();
+});
+
+/// Provider to track the currently selected category filter.
+///
+/// Null means "All" (no category filter).
+final selectedCategoryProvider = StateProvider<String?>((ref) => null);
+
+/// Provider that fetches recipes filtered by category.
+///
+/// Takes a category name as parameter and returns matching recipes.
+/// The match is case-insensitive.
+final recipesByCategoryProvider =
+    FutureProvider.family<List<Recipe>, String>((ref, category) async {
+  final repository = ref.watch(recipeRepositoryProvider);
+  return repository.getRecipesByCategory(category);
+});
