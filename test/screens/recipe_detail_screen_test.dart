@@ -432,6 +432,270 @@ void main() {
       });
     });
 
+    group('Favorite button', () {
+      testWidgets('should display favorite button in AppBar', (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) async {
+                return Recipe()
+                  ..id = 1
+                  ..title = 'Test Recipe'
+                  ..ingredients = []
+                  ..instructions = [];
+              }),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        // Should show unfilled heart when not favorite
+        expect(find.byIcon(Icons.favorite_border), findsOneWidget);
+      });
+
+      testWidgets('should show filled heart when recipe is favorite',
+          (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) async {
+                return Recipe()
+                  ..id = 1
+                  ..title = 'Test Recipe'
+                  ..ingredients = []
+                  ..instructions = []
+                  ..isFavorite = true;
+              }),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        // Should show filled heart when favorite
+        expect(find.byIcon(Icons.favorite), findsOneWidget);
+        expect(find.byIcon(Icons.favorite_border), findsNothing);
+      });
+
+      testWidgets('should show unfilled heart when recipe is not favorite',
+          (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) async {
+                return Recipe()
+                  ..id = 1
+                  ..title = 'Test Recipe'
+                  ..ingredients = []
+                  ..instructions = []
+                  ..isFavorite = false;
+              }),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        // Should show unfilled heart when not favorite
+        expect(find.byIcon(Icons.favorite_border), findsOneWidget);
+        expect(find.byIcon(Icons.favorite), findsNothing);
+      });
+
+      testWidgets('should have tooltip for non-favorite recipe',
+          (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) async {
+                return Recipe()
+                  ..id = 1
+                  ..title = 'Test Recipe'
+                  ..ingredients = []
+                  ..instructions = []
+                  ..isFavorite = false;
+              }),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        final favoriteButton = find.ancestor(
+          of: find.byIcon(Icons.favorite_border),
+          matching: find.byType(IconButton),
+        );
+
+        expect(favoriteButton, findsOneWidget);
+        final widget = tester.widget<IconButton>(favoriteButton);
+        expect(widget.tooltip, 'Add to favorites');
+      });
+
+      testWidgets('should have tooltip for favorite recipe', (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) async {
+                return Recipe()
+                  ..id = 1
+                  ..title = 'Test Recipe'
+                  ..ingredients = []
+                  ..instructions = []
+                  ..isFavorite = true;
+              }),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        final favoriteButton = find.ancestor(
+          of: find.byIcon(Icons.favorite),
+          matching: find.byType(IconButton),
+        );
+
+        expect(favoriteButton, findsOneWidget);
+        final widget = tester.widget<IconButton>(favoriteButton);
+        expect(widget.tooltip, 'Remove from favorites');
+      });
+
+      testWidgets('favorite heart should have error color when filled',
+          (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) async {
+                return Recipe()
+                  ..id = 1
+                  ..title = 'Test Recipe'
+                  ..ingredients = []
+                  ..instructions = []
+                  ..isFavorite = true;
+              }),
+            ],
+            child: MaterialApp(
+              theme: ThemeData(
+                colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+              ),
+              home: const RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        final iconWidget = tester.widget<Icon>(find.byIcon(Icons.favorite));
+        final context = tester.element(find.byType(RecipeDetailScreen));
+        final expectedColor = Theme.of(context).colorScheme.error;
+
+        expect(iconWidget.color, equals(expectedColor));
+      });
+
+      testWidgets('should not display favorite button in loading state',
+          (tester) async {
+        final completer = Completer<Recipe?>();
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) => completer.future),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        expect(find.byIcon(Icons.favorite), findsNothing);
+        expect(find.byIcon(Icons.favorite_border), findsNothing);
+      });
+
+      testWidgets('should not display favorite button in error state',
+          (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) async {
+                throw Exception('Error');
+              }),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        expect(find.byIcon(Icons.favorite), findsNothing);
+        expect(find.byIcon(Icons.favorite_border), findsNothing);
+      });
+
+      testWidgets('should not display favorite button when recipe not found',
+          (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) async => null),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        expect(find.byIcon(Icons.favorite), findsNothing);
+        expect(find.byIcon(Icons.favorite_border), findsNothing);
+      });
+
+      testWidgets('favorite button should be tappable', (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) async {
+                return Recipe()
+                  ..id = 1
+                  ..title = 'Test Recipe'
+                  ..ingredients = []
+                  ..instructions = [];
+              }),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        final favoriteButton = find.ancestor(
+          of: find.byIcon(Icons.favorite_border),
+          matching: find.byType(IconButton),
+        );
+
+        expect(favoriteButton, findsOneWidget);
+        final widget = tester.widget<IconButton>(favoriteButton);
+        expect(widget.onPressed, isNotNull);
+      });
+    });
+
     group('Edit button', () {
       testWidgets('should display edit button in AppBar', (tester) async {
         await tester.pumpWidget(
@@ -479,9 +743,12 @@ void main() {
         final editButton = find.byIcon(Icons.edit);
         expect(editButton, findsOneWidget);
 
-        final iconButton =
-            tester.widget<IconButton>(find.byType(IconButton).first);
-        expect(iconButton.tooltip, 'Edit recipe');
+        final iconButton = find.ancestor(
+          of: editButton,
+          matching: find.byType(IconButton),
+        );
+        final widget = tester.widget<IconButton>(iconButton);
+        expect(widget.tooltip, 'Edit recipe');
       });
 
       // Navigation to RecipeEditScreen requires database setup because
@@ -628,9 +895,12 @@ void main() {
         expect(deleteButton, findsOneWidget);
 
         // Find the IconButton that contains the delete icon
-        final iconButtons = find.byType(IconButton);
-        final deleteIconButton = tester.widget<IconButton>(iconButtons.at(1));
-        expect(deleteIconButton.tooltip, 'Delete recipe');
+        final iconButton = find.ancestor(
+          of: deleteButton,
+          matching: find.byType(IconButton),
+        );
+        final widget = tester.widget<IconButton>(iconButton);
+        expect(widget.tooltip, 'Delete recipe');
       });
 
       testWidgets('should show confirmation dialog when tapped',
