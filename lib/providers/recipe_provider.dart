@@ -32,3 +32,11 @@ final recipeSearchProvider =
   final repository = ref.watch(recipeRepositoryProvider);
   return repository.searchRecipes(query);
 });
+
+/// Provider that fetches a single recipe by its ID.
+///
+/// Returns null if the recipe doesn't exist.
+final recipeByIdProvider = FutureProvider.family<Recipe?, int>((ref, id) async {
+  final repository = ref.watch(recipeRepositoryProvider);
+  return repository.getRecipeById(id);
+});
