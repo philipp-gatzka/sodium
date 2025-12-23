@@ -115,6 +115,45 @@ class RecipeDetailScreen extends ConsumerWidget {
                 },
                 tooltip: 'Edit recipe',
               ),
+              IconButton(
+                icon: const Icon(Icons.delete),
+                onPressed: () async {
+                  final confirmed = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Delete this recipe?'),
+                      content: const Text(
+                        'This action cannot be undone.',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(false),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(true),
+                          style: TextButton.styleFrom(
+                            foregroundColor:
+                                Theme.of(context).colorScheme.error,
+                          ),
+                          child: const Text('Delete'),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (confirmed == true) {
+                    final repository = ref.read(recipeRepositoryProvider);
+                    await repository.deleteRecipe(recipeId);
+                    // Refresh recipe list
+                    ref.invalidate(recipesProvider);
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  }
+                },
+                tooltip: 'Delete recipe',
+              ),
             ],
           ),
           body: SingleChildScrollView(
