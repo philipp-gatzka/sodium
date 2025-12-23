@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/recipe.dart';
+import '../models/sort_option.dart';
 import '../repositories/recipe_repository.dart';
 import 'database_provider.dart';
 
@@ -13,6 +14,12 @@ final recipeRepositoryProvider = Provider<RecipeRepository>((ref) {
   return RecipeRepository(isar);
 });
 
+/// Provider to track the current sort option.
+///
+/// Defaults to [RecipeSortOption.newestFirst].
+final sortOptionProvider =
+    StateProvider<RecipeSortOption>((ref) => RecipeSortOption.newestFirst);
+
 /// Provider that fetches and manages the list of all recipes.
 ///
 /// Returns recipes sorted by creation date (newest first).
@@ -20,6 +27,15 @@ final recipeRepositoryProvider = Provider<RecipeRepository>((ref) {
 final recipesProvider = FutureProvider<List<Recipe>>((ref) async {
   final repository = ref.watch(recipeRepositoryProvider);
   return repository.getAllRecipes();
+});
+
+/// Provider that fetches recipes with the current sort option applied.
+///
+/// Watches [sortOptionProvider] and returns recipes sorted accordingly.
+final sortedRecipesProvider = FutureProvider<List<Recipe>>((ref) async {
+  final repository = ref.watch(recipeRepositoryProvider);
+  final sortOption = ref.watch(sortOptionProvider);
+  return repository.getAllRecipesSorted(sortOption);
 });
 
 /// Provider that searches for recipes by title.

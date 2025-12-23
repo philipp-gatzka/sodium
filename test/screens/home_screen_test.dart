@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sodium/models/recipe.dart';
+import 'package:sodium/models/sort_option.dart';
 import 'package:sodium/providers/recipe_provider.dart';
 import 'package:sodium/screens/home_screen.dart';
 import 'package:sodium/widgets/empty_state.dart';
@@ -15,6 +16,10 @@ void main() {
         ProviderScope(
           overrides: [
             recipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortOptionProvider
+                .overrideWith((ref) => RecipeSortOption.newestFirst),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -32,6 +37,10 @@ void main() {
         ProviderScope(
           overrides: [
             recipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortOptionProvider
+                .overrideWith((ref) => RecipeSortOption.newestFirst),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -49,6 +58,10 @@ void main() {
         ProviderScope(
           overrides: [
             recipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortOptionProvider
+                .overrideWith((ref) => RecipeSortOption.newestFirst),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -62,14 +75,18 @@ void main() {
     });
 
     testWidgets('should display loading indicator initially', (tester) async {
-      // Use a Completer to control when the future completes
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
             recipesProvider.overrideWith((ref) {
-              // Return a future that resolves immediately but we check before settle
               return Future.value(<Recipe>[]);
             }),
+            sortedRecipesProvider.overrideWith((ref) {
+              return Future.value(<Recipe>[]);
+            }),
+            sortOptionProvider
+                .overrideWith((ref) => RecipeSortOption.newestFirst),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -77,11 +94,9 @@ void main() {
         ),
       );
 
-      // Initial pump shows loading state before async completes
       expect(find.byType(LoadingWidget), findsOneWidget);
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-      // Now let it settle to complete
       await tester.pumpAndSettle();
     });
 
@@ -90,6 +105,10 @@ void main() {
         ProviderScope(
           overrides: [
             recipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortOptionProvider
+                .overrideWith((ref) => RecipeSortOption.newestFirst),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -123,6 +142,10 @@ void main() {
         ProviderScope(
           overrides: [
             recipesProvider.overrideWith((ref) async => recipes),
+            sortedRecipesProvider.overrideWith((ref) async => recipes),
+            sortOptionProvider
+                .overrideWith((ref) => RecipeSortOption.newestFirst),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -144,6 +167,12 @@ void main() {
             recipesProvider.overrideWith((ref) async {
               throw Exception('Test error');
             }),
+            sortedRecipesProvider.overrideWith((ref) async {
+              throw Exception('Test error');
+            }),
+            sortOptionProvider
+                .overrideWith((ref) => RecipeSortOption.newestFirst),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -153,12 +182,11 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Should display user-friendly error message
-      expect(find.text('Failed to load recipes. Please try again.'),
-          findsOneWidget);
-      // Should have retry button
+      expect(
+        find.text('Failed to load recipes. Please try again.'),
+        findsOneWidget,
+      );
       expect(find.text('Retry'), findsOneWidget);
-      // Should show error icon
       expect(find.byIcon(Icons.error_outline), findsOneWidget);
     });
 
@@ -175,6 +203,10 @@ void main() {
         ProviderScope(
           overrides: [
             recipesProvider.overrideWith((ref) async => recipes),
+            sortedRecipesProvider.overrideWith((ref) async => recipes),
+            sortOptionProvider
+                .overrideWith((ref) => RecipeSortOption.newestFirst),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -192,6 +224,10 @@ void main() {
         ProviderScope(
           overrides: [
             recipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortOptionProvider
+                .overrideWith((ref) => RecipeSortOption.newestFirst),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -209,6 +245,10 @@ void main() {
         ProviderScope(
           overrides: [
             recipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortOptionProvider
+                .overrideWith((ref) => RecipeSortOption.newestFirst),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -227,6 +267,10 @@ void main() {
         ProviderScope(
           overrides: [
             recipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortOptionProvider
+                .overrideWith((ref) => RecipeSortOption.newestFirst),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
           ],
           child: const MaterialApp(
             home: HomeScreen(),
@@ -236,12 +280,31 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // FAB should be tappable
       await tester.tap(find.byType(FloatingActionButton));
       await tester.pumpAndSettle();
 
-      // Should navigate to create screen (RecipeEditScreen in create mode)
       expect(find.text('New Recipe'), findsOneWidget);
+    });
+
+    testWidgets('should have sort button in app bar', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            recipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
+            sortOptionProvider
+                .overrideWith((ref) => RecipeSortOption.newestFirst),
+            allCategoriesProvider.overrideWith((ref) async => <String>[]),
+          ],
+          child: const MaterialApp(
+            home: HomeScreen(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.sort), findsOneWidget);
     });
 
     group('Favorites filter', () {
@@ -251,6 +314,10 @@ void main() {
           ProviderScope(
             overrides: [
               recipesProvider.overrideWith((ref) async => <Recipe>[]),
+              sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
+              sortOptionProvider
+                  .overrideWith((ref) => RecipeSortOption.newestFirst),
+              allCategoriesProvider.overrideWith((ref) async => <String>[]),
             ],
             child: const MaterialApp(
               home: HomeScreen(),
@@ -260,7 +327,6 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // Should show unfilled heart icon when favorites filter is off
         expect(find.byIcon(Icons.favorite_border), findsOneWidget);
       });
 
@@ -270,6 +336,10 @@ void main() {
           ProviderScope(
             overrides: [
               recipesProvider.overrideWith((ref) async => <Recipe>[]),
+              sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
+              sortOptionProvider
+                  .overrideWith((ref) => RecipeSortOption.newestFirst),
+              allCategoriesProvider.overrideWith((ref) async => <String>[]),
               favoriteRecipesProvider.overrideWith((ref) async => <Recipe>[]),
             ],
             child: const MaterialApp(
@@ -280,25 +350,21 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // Find the favorites toggle button in the AppBar (the IconButton with favorite_border)
         final appBarFavoriteBorderButton = find.descendant(
           of: find.byType(AppBar),
           matching: find.byIcon(Icons.favorite_border),
         );
         expect(appBarFavoriteBorderButton, findsOneWidget);
 
-        // Tap favorites toggle
         await tester.tap(appBarFavoriteBorderButton);
         await tester.pumpAndSettle();
 
-        // Should now show filled heart in the AppBar
         final appBarFavoriteButton = find.descendant(
           of: find.byType(AppBar),
           matching: find.byIcon(Icons.favorite),
         );
         expect(appBarFavoriteButton, findsOneWidget);
 
-        // The AppBar should no longer have unfilled heart
         final appBarFavoriteBorderButtonAfter = find.descendant(
           of: find.byType(AppBar),
           matching: find.byIcon(Icons.favorite_border),
@@ -312,6 +378,10 @@ void main() {
           ProviderScope(
             overrides: [
               recipesProvider.overrideWith((ref) async => <Recipe>[]),
+              sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
+              sortOptionProvider
+                  .overrideWith((ref) => RecipeSortOption.newestFirst),
+              allCategoriesProvider.overrideWith((ref) async => <String>[]),
               favoriteRecipesProvider.overrideWith((ref) async => <Recipe>[]),
               showFavoritesOnlyProvider.overrideWith((ref) => true),
             ],
@@ -326,8 +396,9 @@ void main() {
         expect(find.byType(EmptyState), findsOneWidget);
         expect(find.text('No favorites yet'), findsOneWidget);
         expect(
-            find.text('Tap the heart icon on a recipe to add it to favorites'),
-            findsOneWidget);
+          find.text('Tap the heart icon on a recipe to add it to favorites'),
+          findsOneWidget,
+        );
       });
 
       testWidgets('should display favorite recipes when filter is on',
@@ -345,6 +416,10 @@ void main() {
           ProviderScope(
             overrides: [
               recipesProvider.overrideWith((ref) async => <Recipe>[]),
+              sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
+              sortOptionProvider
+                  .overrideWith((ref) => RecipeSortOption.newestFirst),
+              allCategoriesProvider.overrideWith((ref) async => <String>[]),
               favoriteRecipesProvider
                   .overrideWith((ref) async => favoriteRecipes),
               showFavoritesOnlyProvider.overrideWith((ref) => true),
@@ -367,6 +442,10 @@ void main() {
           ProviderScope(
             overrides: [
               recipesProvider.overrideWith((ref) async => <Recipe>[]),
+              sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
+              sortOptionProvider
+                  .overrideWith((ref) => RecipeSortOption.newestFirst),
+              allCategoriesProvider.overrideWith((ref) async => <String>[]),
             ],
             child: const MaterialApp(
               home: HomeScreen(),
@@ -392,6 +471,10 @@ void main() {
           ProviderScope(
             overrides: [
               recipesProvider.overrideWith((ref) async => <Recipe>[]),
+              sortedRecipesProvider.overrideWith((ref) async => <Recipe>[]),
+              sortOptionProvider
+                  .overrideWith((ref) => RecipeSortOption.newestFirst),
+              allCategoriesProvider.overrideWith((ref) async => <String>[]),
               favoriteRecipesProvider.overrideWith((ref) async => <Recipe>[]),
               showFavoritesOnlyProvider.overrideWith((ref) => true),
             ],

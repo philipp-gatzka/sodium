@@ -8,6 +8,7 @@ import '../widgets/empty_state.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/recipe_card.dart';
 import '../widgets/search_bar.dart';
+import '../widgets/sort_bottom_sheet.dart';
 import 'recipe_detail_screen.dart';
 import 'recipe_edit_screen.dart';
 
@@ -24,6 +25,7 @@ class HomeScreen extends ConsumerWidget {
     final showFavoritesOnly = ref.watch(showFavoritesOnlyProvider);
     final selectedCategory = ref.watch(selectedCategoryProvider);
     final categoriesAsync = ref.watch(allCategoriesProvider);
+    final currentSortOption = ref.watch(sortOptionProvider);
 
     // Determine which provider to use based on filters
     final AsyncValue<List> recipesAsync;
@@ -34,13 +36,27 @@ class HomeScreen extends ConsumerWidget {
     } else if (selectedCategory != null) {
       recipesAsync = ref.watch(recipesByCategoryProvider(selectedCategory));
     } else {
-      recipesAsync = ref.watch(recipesProvider);
+      // Use sorted recipes provider for the main list
+      recipesAsync = ref.watch(sortedRecipesProvider);
     }
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Recipes'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.sort),
+            onPressed: () async {
+              final selected = await SortBottomSheet.show(
+                context: context,
+                currentOption: currentSortOption,
+              );
+              if (selected != null) {
+                ref.read(sortOptionProvider.notifier).state = selected;
+              }
+            },
+            tooltip: 'Sort recipes',
+          ),
           IconButton(
             icon: Icon(
               showFavoritesOnly ? Icons.favorite : Icons.favorite_border,
@@ -66,6 +82,7 @@ class HomeScreen extends ConsumerWidget {
           );
           // Refresh the list after returning
           ref.invalidate(recipesProvider);
+          ref.invalidate(sortedRecipesProvider);
           ref.invalidate(favoriteRecipesProvider);
           ref.invalidate(allCategoriesProvider);
         },
@@ -134,7 +151,7 @@ class HomeScreen extends ConsumerWidget {
                         } else if (searchQuery.isNotEmpty) {
                           ref.invalidate(recipeSearchProvider(searchQuery));
                         } else {
-                          ref.invalidate(recipesProvider);
+                          ref.invalidate(sortedRecipesProvider);
                         }
                       },
                       child: const Text('Retry'),
@@ -192,6 +209,7 @@ class HomeScreen extends ConsumerWidget {
                           );
                           // Refresh the list after returning (recipe might have been deleted or favorited)
                           ref.invalidate(recipesProvider);
+                          ref.invalidate(sortedRecipesProvider);
                           ref.invalidate(favoriteRecipesProvider);
                           ref.invalidate(allCategoriesProvider);
                         },
