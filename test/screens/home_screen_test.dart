@@ -1,56 +1,182 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sodium/models/recipe.dart';
+import 'package:sodium/providers/recipe_provider.dart';
 import 'package:sodium/screens/home_screen.dart';
+import 'package:sodium/widgets/recipe_card.dart';
 
 void main() {
   group('HomeScreen', () {
     testWidgets('should display app bar with title', (tester) async {
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
+        ProviderScope(
+          overrides: [
+            recipesProvider.overrideWith((ref) async => <Recipe>[]),
+          ],
+          child: const MaterialApp(
             home: HomeScreen(),
           ),
         ),
       );
+
+      await tester.pumpAndSettle();
 
       expect(find.text('My Recipes'), findsOneWidget);
     });
 
     testWidgets('should have a Scaffold', (tester) async {
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
+        ProviderScope(
+          overrides: [
+            recipesProvider.overrideWith((ref) async => <Recipe>[]),
+          ],
+          child: const MaterialApp(
             home: HomeScreen(),
           ),
         ),
       );
+
+      await tester.pumpAndSettle();
 
       expect(find.byType(Scaffold), findsOneWidget);
     });
 
     testWidgets('should have an AppBar', (tester) async {
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
+        ProviderScope(
+          overrides: [
+            recipesProvider.overrideWith((ref) async => <Recipe>[]),
+          ],
+          child: const MaterialApp(
             home: HomeScreen(),
           ),
         ),
       );
+
+      await tester.pumpAndSettle();
 
       expect(find.byType(AppBar), findsOneWidget);
     });
 
-    testWidgets('should display placeholder text', (tester) async {
+    testWidgets('should display loading indicator initially', (tester) async {
+      // Use a Completer to control when the future completes
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
+        ProviderScope(
+          overrides: [
+            recipesProvider.overrideWith((ref) {
+              // Return a future that resolves immediately but we check before settle
+              return Future.value(<Recipe>[]);
+            }),
+          ],
+          child: const MaterialApp(
             home: HomeScreen(),
           ),
         ),
       );
 
-      expect(find.text('Recipe list will appear here'), findsOneWidget);
+      // Initial pump shows loading state before async completes
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+      // Now let it settle to complete
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('should display empty state when no recipes', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            recipesProvider.overrideWith((ref) async => <Recipe>[]),
+          ],
+          child: const MaterialApp(
+            home: HomeScreen(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('No recipes yet. Add your first recipe!'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('should display recipe cards when recipes exist',
+        (tester) async {
+      final recipes = [
+        Recipe()
+          ..id = 1
+          ..title = 'Recipe 1'
+          ..ingredients = ['ingredient']
+          ..instructions = ['step'],
+        Recipe()
+          ..id = 2
+          ..title = 'Recipe 2'
+          ..ingredients = ['ingredient']
+          ..instructions = ['step'],
+      ];
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            recipesProvider.overrideWith((ref) async => recipes),
+          ],
+          child: const MaterialApp(
+            home: HomeScreen(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.byType(RecipeCard), findsNWidgets(2));
+      expect(find.text('Recipe 1'), findsOneWidget);
+      expect(find.text('Recipe 2'), findsOneWidget);
+    });
+
+    testWidgets('should display error message on error', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            recipesProvider.overrideWith((ref) async {
+              throw Exception('Test error');
+            }),
+          ],
+          child: const MaterialApp(
+            home: HomeScreen(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Error:'), findsOneWidget);
+    });
+
+    testWidgets('should have ListView when recipes exist', (tester) async {
+      final recipes = [
+        Recipe()
+          ..id = 1
+          ..title = 'Recipe 1'
+          ..ingredients = []
+          ..instructions = [],
+      ];
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            recipesProvider.overrideWith((ref) async => recipes),
+          ],
+          child: const MaterialApp(
+            home: HomeScreen(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ListView), findsOneWidget);
     });
   });
 }
