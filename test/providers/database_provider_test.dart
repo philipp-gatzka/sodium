@@ -12,6 +12,7 @@ void main() {
     testIsar = await Isar.open(
       [RecipeSchema],
       directory: '',
+      name: 'database_provider_test',
     );
   });
 
