@@ -31,4 +31,11 @@ class RecipeRepository {
   Future<List<Recipe>> getAllRecipes() async {
     return await _isar.recipes.where().sortByCreatedAtDesc().findAll();
   }
+
+  /// Retrieves a single recipe by its unique ID.
+  ///
+  /// Returns null if no recipe with the given [id] exists.
+  Future<Recipe?> getRecipeById(int id) async {
+    return await _isar.recipes.get(id);
+  }
 }
