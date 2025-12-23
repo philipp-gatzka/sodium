@@ -1,0 +1,26 @@
+import 'package:isar/isar.dart';
+
+import '../models/recipe.dart';
+
+/// Repository for managing Recipe data in the Isar database.
+class RecipeRepository {
+  final Isar _isar;
+
+  RecipeRepository(this._isar);
+
+  /// Adds a new recipe to the database.
+  ///
+  /// Sets the [createdAt] and [updatedAt] timestamps to the current time.
+  /// Returns the saved recipe with its generated ID.
+  Future<Recipe> addRecipe(Recipe recipe) async {
+    final now = DateTime.now();
+    recipe.createdAt = now;
+    recipe.updatedAt = now;
+
+    await _isar.writeTxn(() async {
+      await _isar.recipes.put(recipe);
+    });
+
+    return recipe;
+  }
+}
