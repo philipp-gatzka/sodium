@@ -432,6 +432,154 @@ void main() {
       });
     });
 
+    group('Edit button', () {
+      testWidgets('should display edit button in AppBar', (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) async {
+                return Recipe()
+                  ..id = 1
+                  ..title = 'Test Recipe'
+                  ..ingredients = []
+                  ..instructions = [];
+              }),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        expect(find.byIcon(Icons.edit), findsOneWidget);
+      });
+
+      testWidgets('should have edit button with tooltip', (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) async {
+                return Recipe()
+                  ..id = 1
+                  ..title = 'Test Recipe'
+                  ..ingredients = []
+                  ..instructions = [];
+              }),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        final editButton = find.byIcon(Icons.edit);
+        expect(editButton, findsOneWidget);
+
+        final iconButton =
+            tester.widget<IconButton>(find.byType(IconButton).first);
+        expect(iconButton.tooltip, 'Edit recipe');
+      });
+
+      // Navigation to RecipeEditScreen requires database setup because
+      // RecipeEditScreen loads recipe data from Isar. This test is covered
+      // in integration tests where the full database is available.
+      testWidgets('should have edit button that is tappable', (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) async {
+                return Recipe()
+                  ..id = 1
+                  ..title = 'Test Recipe'
+                  ..ingredients = []
+                  ..instructions = [];
+              }),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        // Verify edit button exists and is an IconButton
+        final editButton = find.byIcon(Icons.edit);
+        expect(editButton, findsOneWidget);
+
+        final iconButton = tester.widget<IconButton>(
+          find.ancestor(
+            of: editButton,
+            matching: find.byType(IconButton),
+          ),
+        );
+        expect(iconButton.onPressed, isNotNull);
+      });
+
+      testWidgets('should not display edit button in loading state',
+          (tester) async {
+        final completer = Completer<Recipe?>();
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) => completer.future),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        // In loading state, edit button should not be visible
+        expect(find.byIcon(Icons.edit), findsNothing);
+      });
+
+      testWidgets('should not display edit button in error state',
+          (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) async {
+                throw Exception('Error');
+              }),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        // In error state, edit button should not be visible
+        expect(find.byIcon(Icons.edit), findsNothing);
+      });
+
+      testWidgets('should not display edit button when recipe not found',
+          (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              recipeByIdProvider(1).overrideWith((ref) async => null),
+            ],
+            child: const MaterialApp(
+              home: RecipeDetailScreen(recipeId: 1),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        // When recipe not found, edit button should not be visible
+        expect(find.byIcon(Icons.edit), findsNothing);
+      });
+    });
+
     testWidgets('should have Scaffold', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
