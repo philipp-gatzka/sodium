@@ -152,5 +152,45 @@ void main() {
         expect(recipes[2].title, equals('First Recipe'));
       });
     });
+
+    group('getRecipeById', () {
+      test('should return recipe for valid ID', () async {
+        final recipe = Recipe()
+          ..title = 'Test Recipe'
+          ..ingredients = ['ingredient 1']
+          ..instructions = ['step 1'];
+
+        final saved = await repository.addRecipe(recipe);
+        final retrieved = await repository.getRecipeById(saved.id);
+
+        expect(retrieved, isNotNull);
+        expect(retrieved!.id, equals(saved.id));
+        expect(retrieved.title, equals('Test Recipe'));
+        expect(retrieved.ingredients, equals(['ingredient 1']));
+        expect(retrieved.instructions, equals(['step 1']));
+      });
+
+      test('should return null for non-existent ID', () async {
+        final retrieved = await repository.getRecipeById(99999);
+
+        expect(retrieved, isNull);
+      });
+
+      test('should return correct recipe when multiple exist', () async {
+        final recipe1 = await repository.addRecipe(Recipe()
+          ..title = 'Recipe 1'
+          ..ingredients = []
+          ..instructions = []);
+        await repository.addRecipe(Recipe()
+          ..title = 'Recipe 2'
+          ..ingredients = []
+          ..instructions = []);
+
+        final retrieved = await repository.getRecipeById(recipe1.id);
+
+        expect(retrieved, isNotNull);
+        expect(retrieved!.title, equals('Recipe 1'));
+      });
+    });
   });
 }
