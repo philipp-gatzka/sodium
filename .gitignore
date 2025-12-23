@@ -42,6 +42,12 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Android signing files (NEVER commit these!)
+*.jks
+*.keystore
+key.properties
+android/key.properties
+
 # Isar native binaries (downloaded during tests)
 libisar.so
 libisar.dylib
