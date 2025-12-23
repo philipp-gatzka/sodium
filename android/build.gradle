@@ -5,6 +5,15 @@ allprojects {
     }
 }
 
+// Fix for isar_flutter_libs namespace issue with AGP 8.x
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty('android') && project.android.hasProperty('namespace') && project.android.namespace == null) {
+            project.android.namespace = project.group.toString()
+        }
+    }
+}
+
 rootProject.buildDir = "../build"
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
