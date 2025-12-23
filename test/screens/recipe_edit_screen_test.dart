@@ -135,7 +135,8 @@ void main() {
         );
 
         // Find the title text field by its hint text
-        final titleField = find.widgetWithText(TextFormField, 'Enter recipe name');
+        final titleField =
+            find.widgetWithText(TextFormField, 'Enter recipe name');
         await tester.enterText(titleField, 'My Recipe');
         await tester.pump();
 
@@ -170,7 +171,8 @@ void main() {
         );
 
         // Enter title
-        final titleField = find.widgetWithText(TextFormField, 'Enter recipe name');
+        final titleField =
+            find.widgetWithText(TextFormField, 'Enter recipe name');
         await tester.enterText(titleField, 'Valid Title');
         await tester.pump();
 
