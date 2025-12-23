@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'screens/home_screen.dart';
+
 /// The root widget of the Sodium recipe app.
 class SodiumApp extends StatelessWidget {
   const SodiumApp({super.key});
@@ -12,11 +14,7 @@ class SodiumApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
         useMaterial3: true,
       ),
-      home: const Scaffold(
-        body: Center(
-          child: Text('Sodium Recipe App'),
-        ),
-      ),
+      home: const HomeScreen(),
     );
   }
 }
