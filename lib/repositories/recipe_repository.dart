@@ -38,4 +38,13 @@ class RecipeRepository {
   Future<Recipe?> getRecipeById(int id) async {
     return await _isar.recipes.get(id);
   }
+
+  /// Deletes a recipe from the database by its ID.
+  ///
+  /// Returns true if the recipe was deleted, false if it didn't exist.
+  Future<bool> deleteRecipe(int id) async {
+    return await _isar.writeTxn(() async {
+      return await _isar.recipes.delete(id);
+    });
+  }
 }

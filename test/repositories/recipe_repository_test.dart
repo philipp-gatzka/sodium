@@ -192,5 +192,53 @@ void main() {
         expect(retrieved!.title, equals('Recipe 1'));
       });
     });
+
+    group('deleteRecipe', () {
+      test('should delete recipe and return true', () async {
+        final recipe = await repository.addRecipe(Recipe()
+          ..title = 'Recipe to Delete'
+          ..ingredients = []
+          ..instructions = []);
+
+        final deleted = await repository.deleteRecipe(recipe.id);
+
+        expect(deleted, isTrue);
+      });
+
+      test('should return false for non-existent ID', () async {
+        final deleted = await repository.deleteRecipe(99999);
+
+        expect(deleted, isFalse);
+      });
+
+      test('should remove recipe from database', () async {
+        final recipe = await repository.addRecipe(Recipe()
+          ..title = 'Recipe to Delete'
+          ..ingredients = []
+          ..instructions = []);
+
+        await repository.deleteRecipe(recipe.id);
+        final retrieved = await repository.getRecipeById(recipe.id);
+
+        expect(retrieved, isNull);
+      });
+
+      test('should not affect other recipes', () async {
+        final recipe1 = await repository.addRecipe(Recipe()
+          ..title = 'Recipe 1'
+          ..ingredients = []
+          ..instructions = []);
+        final recipe2 = await repository.addRecipe(Recipe()
+          ..title = 'Recipe 2'
+          ..ingredients = []
+          ..instructions = []);
+
+        await repository.deleteRecipe(recipe1.id);
+
+        final retrieved = await repository.getRecipeById(recipe2.id);
+        expect(retrieved, isNotNull);
+        expect(retrieved!.title, equals('Recipe 2'));
+      });
+    });
   });
 }
