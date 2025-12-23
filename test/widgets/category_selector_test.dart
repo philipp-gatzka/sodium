@@ -18,8 +18,9 @@ void main() {
 
       expect(find.text('Categories'), findsOneWidget);
       expect(
-          find.text('Select categories for this recipe (optional)'),
-          findsOneWidget);
+        find.text('Select categories for this recipe (optional)'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('should display all default categories', (tester) async {
@@ -141,8 +142,10 @@ void main() {
         ),
       );
 
-      expect(find.widgetWithText(TextField, 'Add custom category'),
-          findsOneWidget);
+      expect(
+        find.widgetWithText(TextField, 'Add custom category'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('should add custom category when submitted', (tester) async {
@@ -306,13 +309,16 @@ void main() {
 
   group('defaultCategories', () {
     test('should have expected categories', () {
-      expect(defaultCategories, containsAll([
-        'Breakfast',
-        'Lunch',
-        'Dinner',
-        'Dessert',
-        'Snack',
-      ]));
+      expect(
+        defaultCategories,
+        containsAll([
+          'Breakfast',
+          'Lunch',
+          'Dinner',
+          'Dessert',
+          'Snack',
+        ]),
+      );
     });
 
     test('should have 10 default categories', () {
