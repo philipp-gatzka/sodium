@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/recipe_provider.dart';
+import '../widgets/empty_state.dart';
 import '../widgets/recipe_card.dart';
 
 /// The main home screen displaying the list of recipes.
@@ -31,8 +32,10 @@ class HomeScreen extends ConsumerWidget {
         ),
         data: (recipes) {
           if (recipes.isEmpty) {
-            return const Center(
-              child: Text('No recipes yet. Add your first recipe!'),
+            return const EmptyState(
+              icon: Icons.restaurant_menu,
+              primaryMessage: 'No recipes yet',
+              secondaryMessage: 'Tap + to add your first recipe',
             );
           }
 

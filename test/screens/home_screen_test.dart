@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sodium/models/recipe.dart';
 import 'package:sodium/providers/recipe_provider.dart';
 import 'package:sodium/screens/home_screen.dart';
+import 'package:sodium/widgets/empty_state.dart';
 import 'package:sodium/widgets/recipe_card.dart';
 
 void main() {
@@ -96,10 +97,9 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(
-        find.text('No recipes yet. Add your first recipe!'),
-        findsOneWidget,
-      );
+      expect(find.byType(EmptyState), findsOneWidget);
+      expect(find.text('No recipes yet'), findsOneWidget);
+      expect(find.text('Tap + to add your first recipe'), findsOneWidget);
     });
 
     testWidgets('should display recipe cards when recipes exist',
