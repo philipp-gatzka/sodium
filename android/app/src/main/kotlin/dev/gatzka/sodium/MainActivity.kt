@@ -1,4 +1,4 @@
-package com.example.sodium
+package dev.gatzka.sodium
 
 import io.flutter.embedding.android.FlutterActivity
 
