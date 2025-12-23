@@ -20,13 +20,37 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final searchQuery = ref.watch(searchQueryProvider);
-    final recipesAsync = searchQuery.isEmpty
-        ? ref.watch(recipesProvider)
-        : ref.watch(recipeSearchProvider(searchQuery));
+    final showFavoritesOnly = ref.watch(showFavoritesOnlyProvider);
+
+    // Determine which provider to use based on filters
+    final AsyncValue<List> recipesAsync;
+    if (showFavoritesOnly && searchQuery.isEmpty) {
+      recipesAsync = ref.watch(favoriteRecipesProvider);
+    } else if (searchQuery.isNotEmpty) {
+      recipesAsync = ref.watch(recipeSearchProvider(searchQuery));
+    } else {
+      recipesAsync = ref.watch(recipesProvider);
+    }
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Recipes'),
+        actions: [
+          IconButton(
+            icon: Icon(
+              showFavoritesOnly ? Icons.favorite : Icons.favorite_border,
+              color: showFavoritesOnly
+                  ? Theme.of(context).colorScheme.error
+                  : null,
+            ),
+            onPressed: () {
+              ref.read(showFavoritesOnlyProvider.notifier).state =
+                  !showFavoritesOnly;
+            },
+            tooltip:
+                showFavoritesOnly ? 'Show all recipes' : 'Show favorites only',
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -37,6 +61,7 @@ class HomeScreen extends ConsumerWidget {
           );
           // Refresh the list after returning
           ref.invalidate(recipesProvider);
+          ref.invalidate(favoriteRecipesProvider);
         },
         child: const Icon(Icons.add),
       ),
@@ -64,16 +89,20 @@ class HomeScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      searchQuery.isNotEmpty
-                          ? ErrorMessages.searchFailed
-                          : ErrorMessages.loadRecipesFailed,
+                      showFavoritesOnly
+                          ? ErrorMessages.loadFavoritesFailed
+                          : searchQuery.isNotEmpty
+                              ? ErrorMessages.searchFailed
+                              : ErrorMessages.loadRecipesFailed,
                       style: Theme.of(context).textTheme.titleMedium,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () {
-                        if (searchQuery.isNotEmpty) {
+                        if (showFavoritesOnly) {
+                          ref.invalidate(favoriteRecipesProvider);
+                        } else if (searchQuery.isNotEmpty) {
                           ref.invalidate(recipeSearchProvider(searchQuery));
                         } else {
                           ref.invalidate(recipesProvider);
@@ -91,6 +120,14 @@ class HomeScreen extends ConsumerWidget {
                       icon: Icons.search_off,
                       primaryMessage: 'No recipes found',
                       secondaryMessage: 'Try a different search term',
+                    );
+                  }
+                  if (showFavoritesOnly) {
+                    return const EmptyState(
+                      icon: Icons.favorite_border,
+                      primaryMessage: 'No favorites yet',
+                      secondaryMessage:
+                          'Tap the heart icon on a recipe to add it to favorites',
                     );
                   }
                   return const EmptyState(
@@ -116,8 +153,9 @@ class HomeScreen extends ConsumerWidget {
                                   RecipeDetailScreen(recipeId: recipe.id),
                             ),
                           );
-                          // Refresh the list after returning (recipe might have been deleted)
+                          // Refresh the list after returning (recipe might have been deleted or favorited)
                           ref.invalidate(recipesProvider);
+                          ref.invalidate(favoriteRecipesProvider);
                         },
                       ),
                     );
