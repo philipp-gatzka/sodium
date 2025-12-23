@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/recipe_provider.dart';
@@ -102,6 +103,26 @@ class RecipeDetailScreen extends ConsumerWidget {
           appBar: AppBar(
             title: Text(recipe.title),
             actions: [
+              IconButton(
+                icon: Icon(
+                  recipe.isFavorite ? Icons.favorite : Icons.favorite_border,
+                  color: recipe.isFavorite
+                      ? Theme.of(context).colorScheme.error
+                      : null,
+                ),
+                onPressed: () async {
+                  HapticFeedback.lightImpact();
+                  final repository = ref.read(recipeRepositoryProvider);
+                  await repository.toggleFavorite(recipeId);
+                  // Refresh recipe data and favorites list
+                  ref.invalidate(recipeByIdProvider(recipeId));
+                  ref.invalidate(favoriteRecipesProvider);
+                  ref.invalidate(recipesProvider);
+                },
+                tooltip: recipe.isFavorite
+                    ? 'Remove from favorites'
+                    : 'Add to favorites',
+              ),
               IconButton(
                 icon: const Icon(Icons.edit),
                 onPressed: () async {

@@ -40,3 +40,15 @@ final recipeByIdProvider = FutureProvider.family<Recipe?, int>((ref, id) async {
   final repository = ref.watch(recipeRepositoryProvider);
   return repository.getRecipeById(id);
 });
+
+/// Provider that fetches all favorite recipes.
+///
+/// Returns only recipes where [isFavorite] is true.
+/// Results are sorted by creation date (newest first).
+final favoriteRecipesProvider = FutureProvider<List<Recipe>>((ref) async {
+  final repository = ref.watch(recipeRepositoryProvider);
+  return repository.getFavoriteRecipes();
+});
+
+/// Provider to track whether the home screen shows only favorites.
+final showFavoritesOnlyProvider = StateProvider<bool>((ref) => false);
