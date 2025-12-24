@@ -85,8 +85,9 @@ class AppTheme {
       // Input decoration theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor:
-            _colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        fillColor: _colorScheme.surfaceContainerHighest.withValues(
+          alpha: 0.5,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: _colorScheme.outline),
@@ -215,8 +216,9 @@ class AppTheme {
       // Input decoration theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor:
-            _darkColorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        fillColor: _darkColorScheme.surfaceContainerHighest.withValues(
+          alpha: 0.5,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: _darkColorScheme.outline),
